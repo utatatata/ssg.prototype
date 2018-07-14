@@ -1,0 +1,13 @@
+{
+  "name": "ssg.prototype",
+  "version": "1.0.0",
+  "description": "Static site generator prototype",
+  "main": "index.js",
+  "repository": "https://github.com/utatatata/ssg.prototype.git",
+  "author": "utakuma<utatatata.kuma@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "asciidoctor.js": "^1.5.7-rc.1",
+    "commander": "^2.16.0"
+  }
+}
