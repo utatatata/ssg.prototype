@@ -27,11 +27,13 @@ module.exports = (name, author, email, revnumber, tags, summary, draftsDir, post
         return
       }
 
+      console.log(`Creating the draft '${name}'...`)
       u.mkdir(path.resolve(draftsDir, name))
         .catch(_ => {})
       u.writeFile(
         path.resolve(draftsDir, name, 'index.asciidoc'),
         template(author, email, revnumber, tags, summary)
       )
+      console.log(`Completed.`)
     })
 }
