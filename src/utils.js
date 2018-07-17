@@ -5,6 +5,7 @@ const identity = x => () => x
 
 const readdir = util.promisify(fs.readdir)
 const writeFile = util.promisify(fs.writeFile)
+const mkdir = util.promisify(fs.mkdir)
 const access = util.promisify(fs.access)
 
 const concat = (ys, x) => ys.concat(x)
@@ -32,6 +33,7 @@ module.exports = {
   // fs
   readdir: readdir,
   writeFile: writeFile,
+  mkdir: mkdir,
   access: access,
 }
 

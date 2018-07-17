@@ -1,4 +1,5 @@
 const list = require('./list')
+const _new = require('./new')
 const build = require('./build')
 
 const program = require('commander')
@@ -8,7 +9,7 @@ program
 
 program
   .command('list')
-  .option('-p, --drafts-dir <drafts-dir>', 'Drafts dir')
+  .option('-d, --drafts-dir <drafts-dir>', 'Drafts dir')
   .option('-p, --posts-dir <posts-dir>', 'Posts dir')
   .action(options => {
     list(options.draftsDir || './drafts', options.postsDir || './posts')
@@ -16,9 +17,24 @@ program
 
 program
   .command('new <name>')
+  .option('-d, --drafts-dir <drafts-dir>', 'Drafts dir')
+  .option('-p, --posts-dir <posts-dir>', 'Posts dir')
+  .option('-a, --author <author>', 'author')
+  .option('-e, --email <email>', 'Email')
+  .option('-r --revnumber, -- <revnumber>', 'Revision number')
+  .option('-t, --tags <tags>', 'Tag list')
+  .option('-s, --summary <summary>', 'Summary')
   .action((name, options) => {
-      // TODO
-      console.log(name, optoins)
+    _new(
+      name,
+      options.author,
+      options.email,
+      options.revnumber,
+      options.tags,
+      options.summary,
+      options.draftsDir || './drafts',
+      options.postsDir || './posts',
+    )
   })
 
 program
