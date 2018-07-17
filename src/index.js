@@ -5,8 +5,7 @@ const build = require('./build')
 
 const program = require('commander')
 
-program
-  .version('v1.0.0', '-v, --version')
+program.version('v1.0.0', '-v, --version')
 
 program
   .command('list')
@@ -34,7 +33,7 @@ program
       options.tags,
       options.summary,
       options.draftsDir || './drafts',
-      options.postsDir || './posts',
+      options.postsDir || './posts'
     )
   })
 
