@@ -30,7 +30,7 @@ module.exports = (
     if (exist.posts.length !== 0) {
       console.log(`The post '${name}' already exists`)
       console.log()
-      console.log(`in '${path.resolve(exist.posts[0])}'.`)
+      console.log(`in '${path.resolve(...exist.posts[0])}'.`)
       return
     }
 

@@ -24,8 +24,8 @@ const readPosts = dir => {
       u.mapP(splitedPath =>
         u
           .readdir(path.resolve(...splitedPath))
-          .then(u.filter(day => day.match(/^0[1-9]|[1-2][0-9]|3[01]$/)))
-          .then(u.map(day => splitedPath.concat(day)))
+          .then(u.filter(date => date.match(/^0[1-9]|[1-2][0-9]|3[01]$/)))
+          .then(u.map(date => splitedPath.concat(date)))
       )
     )
     .then(u.reduce(u.concat))
@@ -55,7 +55,6 @@ const readDrafts = dir => {
       u
         .access(path.resolve(dir, draft, 'index.asciidoc'))
         .then(u.constantly(true))
-
         .catch(u.constantly(false))
     )
   )
