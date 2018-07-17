@@ -5,14 +5,6 @@ const moment = require('moment')
 const u = require('./utils')
 const fsu = require('./fsUtils')
 
-const mkdir = async relativeSplitedPath => {
-  let currentPath = ''
-  for (const piece of relativeSplitedPath) {
-    currentPath = path.resolve(currentPath, piece)
-    await u.mkdir(currentPath).catch(u.identity)
-  }
-}
-
 module.exports = async (name, config) => {
   fsu.exist(name, config.draftsDir, config.postsDir).then(async exist => {
     if (exist.drafts.length === 0) {
@@ -27,7 +19,7 @@ module.exports = async (name, config) => {
     const now = moment()
     const [year, month, date] = now.format('YYYY/MM/DD').split('/')
     console.log(`Start to publish '${name}'.`)
-    await mkdir([config.postsDir, year, month, date])
+    await u.mkdirp(path.resolve(config.postsDir, year, month, date))
 
     console.log()
 
