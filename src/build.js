@@ -1,39 +1,19 @@
-const fs = require('fs')
 const path = require('path')
-const util = require('util')
 const asciidoctor = require('asciidoctor.js')()
 
-const readdir = util.promisify(fs.readdir)
-const writeFile = util.promisify(fs.writeFile)
+const u = require('./utils')
+const fsu = require('./fsUtils')
 
-const concat = (ys, x) => ys.concat(x)
-const map = f => xs => xs.map(f)
-const filter = f => xs => xs.filter(f)
-const reduce = f => xs => xs.reduce(f)
-
-const mapP = f => xs => Promise.all(xs.map(x => f(x)))
 
 
 module.exports = (base, output) => {
-  readdir(path.resolve(base))
-    .then(filter(year => year.match(/^\d+$/)))
-    .then(map(year => path.resolve(base, year)))
-    .then(mapP(p => readdir(p)
-      .then(filter(month => month.match(/^0[1-9]|1[0-2]$/)))
-      .then(map(month => path.resolve(p, month)))
-    ))
-    .then(reduce(concat))
-    .then(mapP(p => readdir(p)
-      .then(filter(day => day.match(/^0[1-9]|[1-2][0-9]|3[01]$/)))
-      .then(map(day => path.resolve(p, day)))
-    ))
-    .then(reduce(concat))
-    .then(mapP(p => readdir(p)
-      .then(map(post => path.resolve(p, post)))
-    ))
-    .then(reduce(concat))
-    .then(mapP(p => {
-      const document = asciidoctor.loadFile(path.resolve(p, 'index.asciidoc'))
+   console.log(`start building the posts data from '${path.resolve(base)}/'...`)
+
+   console.log()
+
+   fsu.readPosts(base)
+    .then(u.mapP(splitedPath => {
+      const document = asciidoctor.loadFile(path.resolve(...splitedPath, 'index.asciidoc'))
       const attributes = document.attributes.$$smap
       return {
         title: attributes.doctitle,
@@ -46,5 +26,7 @@ module.exports = (base, output) => {
         body: document.convert(),
       }
     }))
-    .then(posts => writeFile(output, JSON.stringify(posts, null, 2)))
+    .then(posts => u.writeFile(output, JSON.stringify(posts, null, 2)))
+    .then(_ => console.log(`complete to write to '${path.resolve(output)}'.`))
+
 }

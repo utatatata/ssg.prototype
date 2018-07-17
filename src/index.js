@@ -1,9 +1,18 @@
+const list = require('./list')
 const build = require('./build')
 
 const program = require('commander')
 
 program
   .version('v1.0.0', '-v, --version')
+
+program
+  .command('list')
+  .option('-p, --drafts-dir <drafts-dir>', 'Drafts dir')
+  .option('-p, --posts-dir <posts-dir>', 'Posts dir')
+  .action(options => {
+    list(options.draftsDir || './drafts', options.postsDir || './posts')
+  })
 
 program
   .command('new <name>')
@@ -21,10 +30,10 @@ program
 
 program
   .command('build')
-  .option('-b, --base <base>', 'Posts base dir')
+  .option('-p, --posts-dir <posts-dir>', 'Posts dir')
   .option('-o, --output <output>', 'Output file name')
   .action(options => {
-      build(options.base || './posts', options.output || './posts.json')
+    build(options.posts_dir || './posts', options.output || './posts.json')
   })
 
 program.parse(process.argv)
