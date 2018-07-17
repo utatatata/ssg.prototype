@@ -18,8 +18,8 @@ const reduce = f => xs => xs.reduce(f)
 const sort = f => xs => xs.sort(f)
 
 const mapP = f => xs => Promise.all(xs.map(f))
-const filterP = f => xs => Promise.all(xs.map(f)).then(ys => xs.filter((_, i) => ys[i]))
-
+const filterP = f => xs =>
+  Promise.all(xs.map(f)).then(ys => xs.filter((_, i) => ys[i]))
 
 module.exports = {
   // Common
@@ -42,4 +42,3 @@ module.exports = {
   mkdir: mkdir,
   rename: rename,
 }
-

@@ -1,5 +1,5 @@
 module.exports = (author, email, revnumber, tags, description) =>
-`= Title
+  `= Title
 ${author} ${email ? `<${email}>` : ''}
 :revnumber: ${revnumber}
 :tags: ${tags.join()}
