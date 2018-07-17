@@ -1,6 +1,6 @@
 const list = require('./list')
 const _new = require('./new')
-// const publish = require('./publish')
+const publish = require('./publish')
 const build = require('./build')
 
 const program = require('commander')
@@ -42,8 +42,11 @@ program
   .option('-d, --drafts-dir <drafts-dir>', 'Drafts dir')
   .option('-p, --posts-dir <posts-dir>', 'Posts dir')
   .action((name, options) => {
-    // TODO
-    // publish(name, options.draftsDir || './drafts', options.postsDir || './posts')
+    publish(
+      name,
+      options.draftsDir || './drafts',
+      options.postsDir || './posts'
+    )
   })
 
 program
