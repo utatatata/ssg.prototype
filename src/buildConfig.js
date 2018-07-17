@@ -16,23 +16,32 @@ const defaultConfig = {
 
 const parseTags = tags => (tags ? tags.split(',') : [])
 
-const overwrite = (config, options) => ({
-  draftsDir: options.draftsDir || config.draftsDir,
-  postsDir: options.postsDir || config.postsDir,
+const overwrite = (rootDir, config, options) => ({
+  rootDir,
+  draftsDir: path.resolve(rootDir, options.draftsDir || config.draftsDir),
+  postsDir: path.resolve(rootDir, options.postsDir || config.postsDir),
   author: options.author || config.author,
   email: options.email || config.email,
   revnumber: options.revnumber || config.revnumber,
   tags: parseTags(options.tags || config.tags),
   summary: options.summary || config.summary,
-  output: options.output || config.output,
+  output: path.resolve(rootDir, options.output || config.output),
 })
 
 module.exports = async options => {
   try {
     const rootDir = await pkgDir(__dirname)
-    const userConfig = require(path.resolve(rootDir, 'ssgconfig.json'))
-    return overwrite(Object.assign(defaultConfig, userConfig), options)
+    try {
+      const userConfig = require(path.resolve(rootDir, 'ssgconfig.json'))
+      return overwrite(
+        rootDir,
+        Object.assign(defaultConfig, userConfig),
+        options
+      )
+    } catch (_) {
+      return overwrite(rootDir, defaultConfig, options)
+    }
   } catch (_) {
-    return overwrite(defaultConfig, options)
+    throw new Error(`'package.json' does not found.`)
   }
 }

@@ -3,6 +3,7 @@ const _new = require('./new')
 const publish = require('./publish')
 const build = require('./build')
 const buildConfig = require('./buildConfig')
+const init = require('./init')
 
 const program = require('commander')
 
@@ -14,6 +15,7 @@ program
   .option('-p, --posts-dir <posts-dir>', 'Posts dir')
   .action(async options => {
     const config = await buildConfig(options)
+    await init(config)
     list(config)
   })
 
@@ -28,6 +30,7 @@ program
   .option('-s, --summary <summary>', 'Summary')
   .action(async (name, options) => {
     const config = await buildConfig(options)
+    await init(config)
     _new(name, config)
   })
 
@@ -37,6 +40,7 @@ program
   .option('-p, --posts-dir <posts-dir>', 'Posts dir')
   .action(async (name, options) => {
     const config = await buildConfig(options)
+    await init(config)
     publish(name, config)
   })
 
@@ -46,6 +50,7 @@ program
   .option('-o, --output <output>', 'Output file name')
   .action(async options => {
     const config = await buildConfig(options)
+    await init(config)
     build(config)
   })
 

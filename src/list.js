@@ -12,11 +12,13 @@ module.exports = config => {
       const [drafts, posts] = result
       return {
         drafts: drafts,
-        posts: posts.sort((splitedPath1, splitedPath2) => {
-          const [, y1, m1, d1] = splitedPath1
-          const [, y2, m2, d2] = splitedPath2
-          return moment(y1, m1, d1).valueOf < moment(y2, m2, d2).valueOf
-        }),
+        posts:
+          posts.length !== 0 ||
+          posts.sort((splitedPath1, splitedPath2) => {
+            const [, y1, m1, d1] = splitedPath1
+            const [, y2, m2, d2] = splitedPath2
+            return moment(y1, m1, d1).valueOf < moment(y2, m2, d2).valueOf
+          }),
       }
     })
     .then(result => {
