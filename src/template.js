@@ -1,6 +1,6 @@
 module.exports = (author, email, revnumber, tags, description) =>
   `= Title
-${author} ${email ? `<${email}>` : ''}
+${author || 'author'} ${email ? `<${email}>` : ''}
 :revnumber: ${revnumber}
 :tags: ${tags.join()}
 :summary: ${description}

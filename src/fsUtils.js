@@ -17,6 +17,13 @@ const readPosts = dir => {
           .readdir(path.resolve(...splitedPath))
           .then(u.filter(month => month.match(/^0[1-9]|1[0-2]$/)))
           .then(u.map(month => splitedPath.concat(month)))
+          .catch(
+            u.constantly(
+              new Error(
+                `The directory '${path.resolve(...splitedPath)}' doesn't exist.`
+              )
+            )
+          )
       )
     )
     .then(u.reduce(u.concat))
@@ -26,6 +33,13 @@ const readPosts = dir => {
           .readdir(path.resolve(...splitedPath))
           .then(u.filter(date => date.match(/^0[1-9]|[1-2][0-9]|3[01]$/)))
           .then(u.map(date => splitedPath.concat(date)))
+          .catch(
+            u.constantly(
+              new Error(
+                `The directory '${path.resolve(...splitedPath)}' doesn't exist.`
+              )
+            )
+          )
       )
     )
     .then(u.reduce(u.concat))
@@ -34,6 +48,13 @@ const readPosts = dir => {
         u
           .readdir(path.resolve(...splitedPath))
           .then(u.map(post => splitedPath.concat(post)))
+          .catch(
+            u.constantly(
+              new Error(
+                `The directory '${path.resolve(...splitedPath)}' doesn't exist.`
+              )
+            )
+          )
       )
     )
     .then(u.reduce(u.concat))
@@ -45,19 +66,23 @@ const readPosts = dir => {
           .catch(u.constantly(false))
       )
     )
+    .catch(u.constantly(new Error(`The directory '${dir}' doesn't exist.`)))
 }
 
 const readDrafts = dir => {
   dir = parseDir(dir)
 
-  return u.readdir(path.resolve(dir)).then(
-    u.filterP(draft =>
-      u
-        .access(path.resolve(dir, draft, 'index.asciidoc'))
-        .then(u.constantly(true))
-        .catch(u.constantly(false))
+  return u
+    .readdir(path.resolve(dir))
+    .then(
+      u.filterP(draft =>
+        u
+          .access(path.resolve(dir, draft, 'index.asciidoc'))
+          .then(u.constantly(true))
+          .catch(u.constantly(false))
+      )
     )
-  )
+    .catch(u.constantly(new Error(`The directory '${dir}' doesn't exist.`)))
 }
 
 const existFromDrafts = (name, dir) => {
@@ -78,19 +103,27 @@ const existFromPosts = (name, dir) => {
 }
 
 const exist = (name, draftsDir, postsDir) => {
-  postsDir = parseDir(postsDir)
   draftsDir = parseDir(draftsDir)
+  postsDir = parseDir(postsDir)
 
   return Promise.all([
     existFromDrafts(name, draftsDir),
     existFromPosts(name, postsDir),
-  ]).then(result => {
-    const [drafts, posts] = result
-    return {
-      drafts: drafts,
-      posts: posts,
-    }
-  })
+  ])
+    .then(result => {
+      const [drafts, posts] = result
+      return {
+        drafts: drafts,
+        posts: posts,
+      }
+    })
+    .catch(
+      u.constantly(
+        new Error(
+          `The directory '${draftsDir}' or '${postsDir}' doesn't exist.`
+        )
+      )
+    )
 }
 
 module.exports = {
