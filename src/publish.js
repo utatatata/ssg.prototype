@@ -13,9 +13,8 @@ const mkdir = async relativeSplitedPath => {
   }
 }
 
-module.exports = async (name, draftsDir, postsDir) => {
-  fsu.exist(name, draftsDir, postsDir).then(async exist => {
-    console.log(exist)
+module.exports = async (name, config) => {
+  fsu.exist(name, config.draftsDir, config.postsDir).then(async exist => {
     if (exist.drafts.length === 0) {
       console.log(`The draft '${name}' doesn't exist.`)
       return
@@ -28,12 +27,12 @@ module.exports = async (name, draftsDir, postsDir) => {
     const now = moment()
     const [year, month, date] = now.format('YYYY/MM/DD').split('/')
     console.log(`Start to publish '${name}'.`)
-    await mkdir([postsDir, year, month, date])
+    await mkdir([config.postsDir, year, month, date])
 
     console.log()
 
-    const oldDir = path.resolve(draftsDir, name)
-    const publishDir = path.resolve(postsDir, year, month, date, name)
+    const oldDir = path.resolve(config.draftsDir, name)
+    const publishDir = path.resolve(config.postsDir, year, month, date, name)
     console.log('Moving the draft')
     console.log(`'${oldDir}'`)
     console.log('into')

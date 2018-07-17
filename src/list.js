@@ -3,8 +3,11 @@ const moment = require('moment')
 const u = require('./utils')
 const fsu = require('./fsUtils')
 
-module.exports = (draftsBase, postsBase) => {
-  Promise.all([fsu.readDrafts(draftsBase), fsu.readPosts(postsBase)])
+module.exports = config => {
+  Promise.all([
+    fsu.readDrafts(config.draftsDir),
+    fsu.readPosts(config.postsDir),
+  ])
     .then(result => {
       const [drafts, posts] = result
       return {
@@ -30,4 +33,11 @@ module.exports = (draftsBase, postsBase) => {
         console.log(post)
       })
     })
+    .catch(_ =>
+      console.log(
+        `The directory '${config.draftsDir}' or '${
+          config.postsDir
+        }' doesn't exist.`
+      )
+    )
 }

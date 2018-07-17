@@ -4,27 +4,12 @@ const u = require('./utils')
 const fsu = require('./fsUtils')
 const template = require('./template')
 
-module.exports = (
-  name,
-  author,
-  email,
-  revnumber,
-  tags,
-  summary,
-  draftsDir,
-  postsDir
-) => {
-  author = author || 'author'
-  email = email || ''
-  revnumber = revnumber || ''
-  tags = tags ? tags.split(',') : []
-  summary = summary || ''
-
-  fsu.exist(name, draftsDir, postsDir).then(exist => {
+module.exports = (name, config) => {
+  fsu.exist(name, config.draftsDir, config.postsDir).then(exist => {
     if (exist.drafts.length !== 0) {
       console.log(`The draft '${name}' already exists`)
       console.log()
-      console.log(`in '${path.resolve(draftsDir, name)}'.`)
+      console.log(`in '${path.resolve(config.draftsDir, name)}'.`)
       return
     }
     if (exist.posts.length !== 0) {
@@ -35,10 +20,16 @@ module.exports = (
     }
 
     console.log(`Creating the draft '${name}'...`)
-    u.mkdir(path.resolve(draftsDir, name)).catch(_ => {})
+    u.mkdir(path.resolve(config.draftsDir, name)).catch(_ => {})
     u.writeFile(
-      path.resolve(draftsDir, name, 'index.asciidoc'),
-      template(author, email, revnumber, tags, summary)
+      path.resolve(config.draftsDir, name, 'index.asciidoc'),
+      template(
+        config.author,
+        config.email,
+        config.revnumber,
+        config.tags,
+        config.summary
+      )
     )
     console.log(`Completed.`)
   })

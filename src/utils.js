@@ -19,7 +19,9 @@ const sort = f => xs => xs.sort(f)
 
 const mapP = f => xs => Promise.all(xs.map(f))
 const filterP = f => xs =>
-  Promise.all(xs.map(f)).then(ys => xs.filter((_, i) => ys[i]))
+  Promise.all(xs.map(f))
+    .then(ys => xs.filter((_, i) => ys[i]))
+    .catch(constantly(new Error(`'filterP' failed.`)))
 
 module.exports = {
   // Common
