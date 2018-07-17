@@ -75,5 +75,7 @@ typings/
 # VSCode
 .vscode
 
-# test posts dir
+# test data
 /posts
+/drafts
+/posts.json
