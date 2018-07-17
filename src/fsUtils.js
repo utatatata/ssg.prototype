@@ -41,8 +41,26 @@ const readDrafts = base => {
     ))
 }
 
+const exist = (name, draftsDir, postsDir) => {
+  postsDir = parseBase(postsDir)
+  draftsDir = parseBase(draftsDir)
+
+  return Promise.all([readDrafts(draftsDir), readPosts(postsDir)])
+    .then(result => {
+      const [drafts, posts] = result
+      return {
+        drafts: drafts.filter(d => d === name),
+        posts: posts.filter(post => {
+          const [,,,, postName] = post
+          return postName === name
+        })
+      }
+    })
+}
+
 
 module.exports = {
   readPosts,
   readDrafts,
+  exist,
 }
