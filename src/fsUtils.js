@@ -3,14 +3,14 @@ const path = require('path')
 const u = require('./utils')
 
 
-const parseBase = base => path.basename(path.resolve(base))
+const parseDir = dir => path.basename(path.resolve(dir))
 
-const readPosts = base => {
-  base = parseBase(base)
+const readPosts = dir => {
+  dir = parseDir(dir)
 
-  return u.readdir(path.resolve(base))
+  return u.readdir(path.resolve(dir))
     .then(u.filter(year => year.match(/^\d+$/)))
-    .then(u.map(year => [base, year]))
+    .then(u.map(year => [dir, year]))
     .then(u.mapP(splitedPath => u.readdir(path.resolve(...splitedPath))
       .then(u.filter(month => month.match(/^0[1-9]|1[0-2]$/)))
       .then(u.map(month => splitedPath.concat(month)))
@@ -26,34 +26,48 @@ const readPosts = base => {
     ))
     .then(u.reduce(u.concat))
     .then(u.filterP(splitedPath => u.access(path.resolve(...splitedPath, 'index.asciidoc'))
-      .then(u.identity(true))
-      .catch(u.identity(false))
+      .then(u.constantly(true))
+      .catch(u.constantly(false))
     ))
 }
 
-const readDrafts = base => {
-  base = parseBase(base)
+const readDrafts = dir => {
+  dir = parseDir(dir)
 
-  return u.readdir(path.resolve(base))
-    .then(u.filterP(draft => u.access(path.resolve(base, draft, 'index.asciidoc'))
-      .then(u.identity(true))
-      .catch(u.identity(false))
+  return u.readdir(path.resolve(dir))
+    .then(u.filterP(draft => u.access(path.resolve(dir, draft, 'index.asciidoc'))
+      .then(u.constantly(true))
+      .catch(u.constantly(false))
     ))
+}
+
+const existFromDrafts = (name, dir) => {
+  dir = parseDir(dir)
+
+  return readDrafts(dir)
+    .then(u.filterP(draft => draft === name))
+}
+
+const existFromPosts = (name, dir) => {
+  dir = parseDir(dir)
+
+  return readPosts(dir)
+    .then(u.filterP(splitedPath => {
+      const [,,,, post] = splitedPath
+      return post === name
+    }))
 }
 
 const exist = (name, draftsDir, postsDir) => {
-  postsDir = parseBase(postsDir)
-  draftsDir = parseBase(draftsDir)
+  postsDir = parseDir(postsDir)
+  draftsDir = parseDir(draftsDir)
 
-  return Promise.all([readDrafts(draftsDir), readPosts(postsDir)])
+  return Promise.all([existFromDrafts(name, draftsDir), existFromPosts(name, postsDir)])
     .then(result => {
       const [drafts, posts] = result
       return {
-        drafts: drafts.filter(d => d === name),
-        posts: posts.filter(post => {
-          const [,,,, postName] = post
-          return postName === name
-        })
+        drafts: drafts,
+        posts: posts
       }
     })
 }
@@ -62,5 +76,7 @@ const exist = (name, draftsDir, postsDir) => {
 module.exports = {
   readPosts,
   readDrafts,
+  existFromDrafts,
+  existFromPosts,
   exist,
 }

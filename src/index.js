@@ -1,5 +1,6 @@
 const list = require('./list')
 const _new = require('./new')
+// const publish = require('./publish')
 const build = require('./build')
 
 const program = require('commander')
@@ -39,9 +40,11 @@ program
 
 program
   .command('publish <name>')
+  .option('-d, --drafts-dir <drafts-dir>', 'Drafts dir')
+  .option('-p, --posts-dir <posts-dir>', 'Posts dir')
   .action((name, options) => {
-      // TODO
-      console.log(name, optoins)
+    // TODO
+    // publish(name, options.draftsDir || './drafts', options.postsDir || './posts')
   })
 
 program

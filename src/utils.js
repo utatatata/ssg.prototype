@@ -1,12 +1,15 @@
 const fs = require('fs')
 const util = require('util')
 
-const identity = x => () => x
+const identity = x => x
+const constantly = x => () => x
 
 const readdir = util.promisify(fs.readdir)
+const readFile = util.promisify(fs.readFile)
 const writeFile = util.promisify(fs.writeFile)
-const mkdir = util.promisify(fs.mkdir)
 const access = util.promisify(fs.access)
+const mkdir = util.promisify(fs.mkdir)
+const rename = util.promisify(fs.rename)
 
 const concat = (ys, x) => ys.concat(x)
 const map = f => xs => xs.map(f)
@@ -21,6 +24,7 @@ const filterP = f => xs => Promise.all(xs.map(f)).then(ys => xs.filter((_, i) =>
 module.exports = {
   // Common
   identity,
+  constantly,
   // Array
   map: map,
   filter: filter,
@@ -32,8 +36,10 @@ module.exports = {
   filterP: filterP,
   // fs
   readdir: readdir,
+  readFile: readFile,
   writeFile: writeFile,
-  mkdir: mkdir,
   access: access,
+  mkdir: mkdir,
+  rename: rename,
 }
 

@@ -5,7 +5,6 @@ const u = require('./utils')
 const fsu = require('./fsUtils')
 
 
-
 module.exports = (base, output) => {
    console.log(`start building the posts data from '${path.resolve(base)}/'...`)
 
@@ -28,5 +27,4 @@ module.exports = (base, output) => {
     }))
     .then(posts => u.writeFile(output, JSON.stringify(posts, null, 2)))
     .then(_ => console.log(`complete to write to '${path.resolve(output)}'.`))
-
 }
