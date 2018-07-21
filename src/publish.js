@@ -47,6 +47,12 @@ module.exports = async (name, config) => {
         }
       })
       .then(text => u.writeFile(documentPath, text))
-      .then(_ => console.log() || console.log('Completed.'))
+
+    console.log()
+    console.log()
+
+    console.log(`The post '${name}' has successfully published in`)
+    console.log()
+    console.log(`'${publishDir}'.`)
   })
 }

@@ -5,23 +5,23 @@ const fsu = require('./fsUtils')
 const template = require('./template')
 
 module.exports = (name, config) => {
-  fsu.exist(name, config.draftsDir, config.postsDir).then(exist => {
+  fsu.exist(name, config.draftsDir, config.postsDir).then(async exist => {
     if (exist.drafts.length !== 0) {
-      console.log(`The draft '${name}' already exists`)
+      console.log(`The draft '${name}' already exists in`)
       console.log()
-      console.log(`in '${path.resolve(config.draftsDir, name)}'.`)
+      console.log(`'${path.resolve(config.draftsDir, name)}'.`)
       return
     }
     if (exist.posts.length !== 0) {
-      console.log(`The post '${name}' already exists`)
+      console.log(`The post '${name}' already exists in`)
       console.log()
-      console.log(`in '${path.resolve(...exist.posts[0])}'.`)
+      console.log(`'${path.resolve(...exist.posts[0])}'.`)
       return
     }
 
     console.log(`Creating the draft '${name}'...`)
-    u.mkdir(path.resolve(config.draftsDir, name)).catch(_ => {})
-    u.writeFile(
+    await u.mkdir(path.resolve(config.draftsDir, name)).catch(_ => {})
+    await u.writeFile(
       path.resolve(config.draftsDir, name, 'index.asciidoc'),
       template(
         config.author,
@@ -31,6 +31,12 @@ module.exports = (name, config) => {
         config.summary
       )
     )
-    console.log(`Completed.`)
+
+    console.log()
+    console.log()
+
+    console.log(`The new draft '${name}' has successfully created in`)
+    console.log()
+    console.log(`'${path.resolve(config.draftsDir, name)}'.`)
   })
 }
