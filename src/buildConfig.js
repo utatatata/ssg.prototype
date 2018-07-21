@@ -1,8 +1,6 @@
 const path = require('path')
 const pkgDir = require('pkg-dir')
 
-const u = require('./utils')
-
 const defaultConfig = {
   draftsDir: './drafts',
   postsDir: './posts',
@@ -29,19 +27,11 @@ const overwrite = (rootDir, config, options) => ({
 })
 
 module.exports = async options => {
+  const rootDir = await pkgDir(__dirname)
   try {
-    const rootDir = await pkgDir(__dirname)
-    try {
-      const userConfig = require(path.resolve(rootDir, 'ssgconfig.json'))
-      return overwrite(
-        rootDir,
-        Object.assign(defaultConfig, userConfig),
-        options
-      )
-    } catch (_) {
-      return overwrite(rootDir, defaultConfig, options)
-    }
+    const userConfig = require(path.resolve(rootDir, 'ssgconfig.json'))
+    return overwrite(rootDir, Object.assign(defaultConfig, userConfig), options)
   } catch (_) {
-    throw new Error(`'package.json' does not found.`)
+    return overwrite(rootDir, defaultConfig, options)
   }
 }
