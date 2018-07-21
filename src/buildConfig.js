@@ -27,7 +27,7 @@ const overwrite = (rootDir, config, options) => ({
 })
 
 module.exports = async options => {
-  const rootDir = await pkgDir(__dirname)
+  const rootDir = await pkgDir(process.cwd())
   try {
     const userConfig = require(path.resolve(rootDir, 'ssgconfig.json'))
     return overwrite(rootDir, Object.assign(defaultConfig, userConfig), options)
