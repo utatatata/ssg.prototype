@@ -4,16 +4,13 @@ const asciidoctor = require('asciidoctor.js')()
 const u = require('./utils')
 const fsu = require('./fsUtils')
 
-module.exports = config => {
+module.exports = async config => {
   console.log(
     `start building the posts data from '${path.resolve(config.postsDir)}/'...`
   )
 
-  console.log()
-
-  fsu
-    .readPosts(config.postsDir)
-    .then(
+  try {
+    const posts = await fsu.readPosts(config.postsDir).then(
       u.mapP(splitedPath => {
         const document = asciidoctor.loadFile(
           path.resolve(...splitedPath, 'index.asciidoc')
@@ -31,11 +28,19 @@ module.exports = config => {
         }
       })
     )
-    .then(posts => u.writeFile(config.output, JSON.stringify(posts, null, 2)))
-    .then(_ =>
-      console.log(`complete to write to '${path.resolve(config.output)}'.`)
+
+    await u.writeFile(config.output, JSON.stringify(posts, null, 2))
+
+    console.log()
+    console.log()
+    console.log(
+      `The posts data '${path.basename(
+        config.output
+      )}' has successfully created in`
     )
-    .catch(_ =>
-      console.log(`The directory '${config.postsDir}' doesn't exist.`)
-    )
+    console.log()
+    console.log(`'${config.output}'.`)
+  } catch (_) {
+    console.log(`The directory '${config.postsDir}' doesn't exist.`)
+  }
 }
