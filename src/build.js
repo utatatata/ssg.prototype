@@ -10,26 +10,24 @@ module.exports = async config => {
   )
 
   try {
-    const posts = await fsu.readPosts(config.postsDir).then(
-      u.mapP(splitedPath => {
-        const document = asciidoctor.loadFile(
-          path.resolve(...splitedPath, 'index.asciidoc')
-        )
-        const attributes = document.attributes.$$smap
-        return {
-          title: attributes.doctitle,
-          author: attributes.author,
-          email: attributes.email,
-          revnumber: attributes.revnumber,
-          revdate: attributes.revdate,
-          tags: attributes.tags,
-          description: attributes.description,
-          body: document.convert(),
-        }
-      })
-    )
+    const posts = await fsu.readPosts(config.postsDir)
 
-    await u.writeFile(config.output, JSON.stringify(posts, null, 2))
+    const documentList = posts.map(splitedPath => {
+      const document = asciidoctor.loadFile(path.resolve(...splitedPath))
+      const attributes = document.attributes.$$smap
+      return {
+        title: attributes.doctitle,
+        author: attributes.author,
+        email: attributes.email,
+        revnumber: attributes.revnumber,
+        revdate: attributes.revdate,
+        tags: attributes.tags,
+        description: attributes.description,
+        body: document.convert(),
+      }
+    })
+
+    await u.writeFile(config.output, JSON.stringify(documentList, null, 2))
 
     console.log()
     console.log()
@@ -40,7 +38,9 @@ module.exports = async config => {
     )
     console.log()
     console.log(`'${config.output}'.`)
-  } catch (_) {
-    console.log(`The directory '${config.postsDir}' doesn't exist.`)
+  } catch (e) {
+    console.log(`The command 'build' failed with error:`)
+    console.log()
+    console.log(e)
   }
 }

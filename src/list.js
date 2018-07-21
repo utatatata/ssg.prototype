@@ -1,6 +1,6 @@
+const path = require('path')
 const moment = require('moment')
 
-const u = require('./utils')
 const fsu = require('./fsUtils')
 
 module.exports = async config => {
@@ -19,23 +19,21 @@ module.exports = async config => {
       : []
 
     console.log('Drafts:')
-    drafts.forEach(draft => {
-      console.log(draft)
+    drafts.forEach(splitedPath => {
+      const name = path.basename(path.dirname(path.resolve(...splitedPath)))
+      console.log(name)
     })
 
     console.log()
 
     console.log('Posts:')
     sortedPosts.forEach(splitedPath => {
-      const [, , , , post] = splitedPath
-      console.log(post)
+      const name = path.basename(path.dirname(path.resolve(...splitedPath)))
+      console.log(name)
     })
   } catch (e) {
+    console.log(`The command 'list' failed with error:`)
+    console.log()
     console.log(e)
-    console.log(
-      `The directory '${config.draftsDir}' or '${
-        config.postsDir
-      }' doesn't exist.`
-    )
   }
 }

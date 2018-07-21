@@ -5,54 +5,59 @@ const moment = require('moment')
 const u = require('./utils')
 const fsu = require('./fsUtils')
 
+const updateRevdate = (documentText, dateString) => {
+  const revdate = `:revdate: ${dateString}\n`
+  if (documentText.match(/^:revdate:/m)) {
+    return documentText.replace(/^:revdate:.*[\r?\n]/m, revdate)
+  } else {
+    return documentText.replace(/^:revnumber:/m, `${revdate}:revnumber:`)
+  }
+}
+
 module.exports = async (name, config) => {
-  fsu.exist(name, config.draftsDir, config.postsDir).then(async exist => {
-    if (exist.drafts.length === 0) {
-      console.log(`The draft '${name}' doesn't exist.`)
-      return
-    }
-    if (exist.posts.length !== 0) {
-      console.log(`The post '${name}' already exist.`)
-      return
-    }
-
-    const now = moment()
-    const [year, month, date] = now.format('YYYY/MM/DD').split('/')
-    console.log(`Start to publish '${name}'.`)
-    await u.mkdirp(path.resolve(config.postsDir, year, month, date))
-
+  const exist = await fsu.exist(name, config.draftsDir, config.postsDir)
+  if (exist.drafts.length === 0) {
+    console.log(`The draft '${name}' doesn't exist.`)
+    return
+  }
+  if (exist.posts.length !== 0) {
+    console.log(`The post '${name}' already exists in`)
     console.log()
+    console.log(`'${path.resolve(...exist.posts[0])}'.`)
+    return
+  }
 
-    const oldDir = path.resolve(config.draftsDir, name)
-    const publishDir = path.resolve(config.postsDir, year, month, date, name)
-    console.log('Moving the draft')
-    console.log(`'${oldDir}'`)
-    console.log('into')
-    console.log(`'${publishDir}'`)
-    await u.rename(oldDir, publishDir)
+  console.log(`Start to publish '${name}'.`)
 
-    console.log()
+  const now = moment()
+  const oldDir = path.resolve(config.draftsDir, name)
+  const publishDir = path.resolve(
+    config.postsDir,
+    now.format('YYYY/MM/DD'),
+    name
+  )
+  await u.mkdirp(path.dirname(publishDir))
 
-    const documentPath = path.resolve(publishDir, 'index.asciidoc')
-    console.log(`Updating revision date of the post '${name}'...`)
-    await u
-      .readFile(documentPath)
-      .then(text => text.toString())
-      .then(text => {
-        const revdate = `:revdate: ${now.format()}\n`
-        if (text.match(/^:revdate:/m)) {
-          return text.replace(/^:revdate:.*[\r?\n]/m, revdate)
-        } else {
-          return text.replace(/^:revnumber:/m, `${revdate}:revnumber:`)
-        }
-      })
-      .then(text => u.writeFile(documentPath, text))
+  console.log()
 
-    console.log()
-    console.log()
+  console.log(`Moving the draft '${name}' from`)
+  console.log(`'${oldDir}'`)
+  console.log('into')
+  console.log(`'${publishDir}'...`)
+  await u.rename(oldDir, publishDir)
 
-    console.log(`The post '${name}' has successfully published in`)
-    console.log()
-    console.log(`'${publishDir}'.`)
-  })
+  console.log()
+
+  console.log(`Updating revision date of the post '${name}'...`)
+  const documentPath = path.resolve(publishDir, 'index.asciidoc')
+  const text = (await u.readFile(documentPath)).toString()
+  const replacedText = updateRevdate(text, now.format())
+  await u.writeFile(documentPath, replacedText)
+
+  console.log()
+  console.log()
+
+  console.log(`The post '${name}' has successfully published in`)
+  console.log()
+  console.log(`'${publishDir}'.`)
 }

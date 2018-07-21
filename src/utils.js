@@ -8,14 +8,14 @@ const constantly = x => () => x
 const concat = (ys, x) => ys.concat(x)
 const map = f => xs => xs.map(f)
 const filter = f => xs => xs.filter(f)
-const reduce = f => xs => (xs.length === 0 ? [] : xs.reduce(f))
+const reduce = f => xs => (xs.length === 0 ? [] : xs.reduce(f, []))
 const sort = f => xs => xs.sort(f)
 
 const mapP = f => xs => Promise.all(xs.map(f))
-const filterP = f => xs =>
-  Promise.all(xs.map(f))
-    .then(ys => xs.filter((_, i) => ys[i]))
-    .catch(constantly(new Error(`'filterP' failed.`)))
+const filterP = predicate => async xs => {
+  const satisfiedList = await mapP(predicate)(xs)
+  return xs.filter((_, i) => satisfiedList[i])
+}
 
 const readdir = util.promisify(fs.readdir)
 const readFile = util.promisify(fs.readFile)

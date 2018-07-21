@@ -2,128 +2,91 @@ const path = require('path')
 
 const u = require('./utils')
 
-const parseDir = dir => path.basename(path.resolve(dir))
+const readDrafts = async dir => {
+  const splitedDraftPathList = (await u.readdir(dir)).map(draft => [dir, draft])
 
-const readPosts = dir => {
-  dir = parseDir(dir)
-
-  return u
-    .readdir(path.resolve(dir))
-    .then(u.filter(year => year.match(/^\d+$/)))
-    .then(u.map(year => [dir, year]))
-    .then(
-      u.mapP(splitedPath =>
-        u
-          .readdir(path.resolve(...splitedPath))
-          .then(u.filter(month => month.match(/^0[1-9]|1[0-2]$/)))
-          .then(u.map(month => splitedPath.concat(month)))
-          .catch(
-            u.constantly(
-              new Error(
-                `The directory '${path.resolve(...splitedPath)}' doesn't exist.`
-              )
-            )
-          )
-      )
+  const splitedDocumentPathList = u.filterP(splitedPath =>
+    u
+      .access(path.resolve(...splitedPath))
+      .then(u.constantly(true))
+      .catch(u.constantly(false))
+  )(
+    splitedDraftPathList.map(splitedPath =>
+      splitedPath.concat('index.asciidoc')
     )
-    .then(u.reduce(u.concat))
-    .then(
-      u.mapP(splitedPath =>
-        u
-          .readdir(path.resolve(...splitedPath))
-          .then(u.filter(date => date.match(/^0[1-9]|[1-2][0-9]|3[01]$/)))
-          .then(u.map(date => splitedPath.concat(date)))
-          .catch(
-            u.constantly(
-              new Error(
-                `The directory '${path.resolve(...splitedPath)}' doesn't exist.`
-              )
-            )
-          )
-      )
-    )
-    .then(u.reduce(u.concat))
-    .then(
-      u.mapP(splitedPath =>
-        u
-          .readdir(path.resolve(...splitedPath))
-          .then(u.map(post => splitedPath.concat(post)))
-          .catch(
-            u.constantly(
-              new Error(
-                `The directory '${path.resolve(...splitedPath)}' doesn't exist.`
-              )
-            )
-          )
-      )
-    )
-    .then(u.reduce(u.concat))
-    .then(
-      u.filterP(splitedPath =>
-        u
-          .access(path.resolve(...splitedPath, 'index.asciidoc'))
-          .then(u.constantly(true))
-          .catch(u.constantly(false))
-      )
-    )
-    .catch(u.constantly(new Error(`The directory '${dir}' doesn't exist.`)))
-}
-
-const readDrafts = dir => {
-  dir = parseDir(dir)
-
-  return u
-    .readdir(path.resolve(dir))
-    .then(
-      u.filterP(draft =>
-        u
-          .access(path.resolve(dir, draft, 'index.asciidoc'))
-          .then(u.constantly(true))
-          .catch(u.constantly(false))
-      )
-    )
-    .catch(u.constantly(new Error(`The directory '${dir}' doesn't exist.`)))
-}
-
-const existFromDrafts = (name, dir) => {
-  dir = parseDir(dir)
-
-  return readDrafts(dir).then(u.filterP(draft => draft === name))
-}
-
-const existFromPosts = (name, dir) => {
-  dir = parseDir(dir)
-
-  return readPosts(dir).then(
-    u.filterP(splitedPath => {
-      const [, , , , post] = splitedPath
-      return post === name
-    })
   )
+
+  return splitedDocumentPathList
 }
 
-const exist = (name, draftsDir, postsDir) => {
-  draftsDir = parseDir(draftsDir)
-  postsDir = parseDir(postsDir)
+const readPosts = async dir => {
+  const splitedYearPathList = (await u.readdir(dir))
+    .filter(year => year.match(/^\d+$/))
+    .map(year => [dir, year])
 
-  return Promise.all([
+  const splitedMonthPathList = (await Promise.all(
+    splitedYearPathList.map(async splitedPath => {
+      const monthDirList = await u.readdir(path.resolve(...splitedPath))
+      return monthDirList
+        .filter(month => month.match(/^0[1-9]|1[0-2]$/))
+        .map(month => splitedPath.concat(month))
+    })
+  )).reduce(u.concat, [])
+
+  const splitedDatePathList = (await Promise.all(
+    splitedMonthPathList.map(async splitedPath => {
+      const dateDirList = await u.readdir(path.resolve(...splitedPath))
+      return dateDirList
+        .filter(date => date.match(/^0[1-9]|[1-2][0-9]|3[01]$/))
+        .map(date => splitedPath.concat(date))
+    })
+  )).reduce(u.concat, [])
+
+  const splitedPostPathList = (await Promise.all(
+    splitedDatePathList.map(async splitedPath => {
+      const postDirList = await u.readdir(path.resolve(...splitedPath))
+      return postDirList.map(post => splitedPath.concat(post))
+    })
+  )).reduce(u.concat, [])
+
+  const splitedDocumentPathList = u.filterP(splitedPath =>
+    u
+      .access(path.resolve(...splitedPath))
+      .then(u.constantly(true))
+      .catch(u.constantly(false))
+  )(
+    splitedPostPathList.map(splitedPath => splitedPath.concat('index.asciidoc'))
+  )
+
+  return splitedDocumentPathList
+}
+
+const existFromDrafts = async (name, dir) => {
+  const drafts = await readDrafts(dir)
+  const result = drafts.filter(splitedPath => {
+    const draftName = path.basename(path.dirname(path.resolve(...splitedPath)))
+    return draftName === name
+  })
+  return result
+}
+
+const existFromPosts = async (name, dir) => {
+  const posts = await readPosts(dir)
+  return posts.filter(splitedPath => {
+    const postName = path.basename(path.dirname(path.resolve(...splitedPath)))
+    return postName === name
+  })
+}
+
+const exist = async (name, draftsDir, postsDir) => {
+  const [drafts, posts] = await Promise.all([
     existFromDrafts(name, draftsDir),
     existFromPosts(name, postsDir),
   ])
-    .then(result => {
-      const [drafts, posts] = result
-      return {
-        drafts: drafts,
-        posts: posts,
-      }
-    })
-    .catch(
-      u.constantly(
-        new Error(
-          `The directory '${draftsDir}' or '${postsDir}' doesn't exist.`
-        )
-      )
-    )
+  return {
+    drafts,
+    posts,
+  }
 }
 
 module.exports = {
