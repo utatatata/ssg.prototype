@@ -46,10 +46,10 @@ ssg-prototype publish <title>
 
 This command moves the directory`./drafts/title/` into `./posts/YYYY/MM/DD/title/`.
 
-### Build Posts
+### Generate Posts
 
 ```
-ssg-prototype build
+ssg-prototype generate
 ```
 
 See `./posts.json` is created.
@@ -67,6 +67,6 @@ Every command option can be specified in `./ssgconfig.json`.
 }
 ```
 
-## Authoer
+## Author
 
 [utakuma<utatatata.kuma@gmail.com>](https://github.com/utatatata)

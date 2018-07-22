@@ -1,7 +1,7 @@
 const list = require('./list')
 const _new = require('./new')
 const publish = require('./publish')
-const build = require('./build')
+const generate = require('./generate')
 const buildConfig = require('./buildConfig')
 const init = require('./init')
 
@@ -45,13 +45,13 @@ program
   })
 
 program
-  .command('build')
+  .command('generate')
   .option('-p, --posts-dir <posts-dir>', 'Posts dir')
   .option('-o, --output <output>', 'Output file name')
   .action(async options => {
     const config = await buildConfig(options)
     await init(config)
-    build(config)
+    generate(config)
   })
 
 program.parse(process.argv)

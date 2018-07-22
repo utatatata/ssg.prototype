@@ -6,7 +6,7 @@ const fsu = require('./fsUtils')
 
 module.exports = async config => {
   console.log(
-    `start building the posts data from '${path.resolve(config.postsDir)}/'...`
+    `start generating the posts data from '${path.resolve(config.postsDir)}/'...`
   )
 
   try {
@@ -39,7 +39,7 @@ module.exports = async config => {
     console.log()
     console.log(`'${config.output}'.`)
   } catch (e) {
-    console.log(`The command 'build' failed with error:`)
+    console.log(`The command 'generate' failed with error:`)
     console.log()
     console.log(e)
   }
