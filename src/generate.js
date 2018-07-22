@@ -27,6 +27,7 @@ module.exports = async config => {
       }
     })
 
+    await u.mkdirp(path.dirname(config.output))
     await u.writeFile(config.output, JSON.stringify(documentList, null, 2))
 
     console.log()
