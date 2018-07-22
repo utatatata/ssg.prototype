@@ -22,7 +22,7 @@ module.exports = async config => {
         revnumber: attributes.revnumber,
         revdate: attributes.revdate,
         tags: attributes.tags,
-        description: attributes.description,
+        summary: attributes.summary,
         body: document.convert(),
       }
     })
