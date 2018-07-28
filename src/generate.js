@@ -6,7 +6,9 @@ const fsu = require('./fsUtils')
 
 module.exports = async config => {
   console.log(
-    `start generating the posts data from '${path.resolve(config.postsDir)}/'...`
+    `start generating the posts data from '${path.resolve(
+      config.postsDir
+    )}/'...`
   )
 
   try {
@@ -14,15 +16,14 @@ module.exports = async config => {
 
     const documentList = posts.map(splitedPath => {
       const document = asciidoctor.loadFile(path.resolve(...splitedPath))
-      const attributes = document.attributes.$$smap
       return {
-        title: attributes.doctitle,
-        author: attributes.author,
-        email: attributes.email,
-        revnumber: attributes.revnumber,
-        revdate: attributes.revdate,
-        tags: attributes.tags,
-        summary: attributes.summary,
+        title: document.getAttribute('doctitle'),
+        author: document.getAttribute('author'),
+        email: document.getAttribute('email'),
+        revnumber: document.getAttribute('revnumber'),
+        revdate: document.getAttribute('revdate'),
+        tags: document.getAttribute('tags'),
+        summary: document.getAttribute('summary'),
         body: document.convert(),
       }
     })
