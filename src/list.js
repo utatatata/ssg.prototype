@@ -20,7 +20,7 @@ module.exports = async config => {
 
     console.log('Drafts:')
     drafts.forEach(splitedPath => {
-      const name = path.basename(path.dirname(path.resolve(...splitedPath)))
+      const [draftsDir, name, document] = splitedPath
       console.log(name)
     })
 
@@ -28,8 +28,8 @@ module.exports = async config => {
 
     console.log('Posts:')
     sortedPosts.forEach(splitedPath => {
-      const name = path.basename(path.dirname(path.resolve(...splitedPath)))
-      console.log(name)
+      const [postsDir, year, month, date, name, document] = splitedPath
+      console.log(name, `(${year}-${month}-${date})`)
     })
   } catch (e) {
     console.log(`The command 'list' failed with error:`)

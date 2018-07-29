@@ -16,18 +16,31 @@ const updateRevdate = (documentText, dateString) => {
 
 module.exports = async (name, config) => {
   const exist = await pdu.exist(name, config.draftsDir, config.postsDir)
+
   if (exist.drafts.length === 0) {
-    console.log(`The draft '${name}' doesn't exist.`)
+    const relativePath = config.draftsDir.replace(config.rootDir, '')
+    console.log(`The draft '${name}' doesn't exist in '${relativePath}'.`)
+    console.log()
+    console.log(`To create new draft '${name}', you can use new command.`)
     return
   }
   if (exist.posts.length !== 0) {
-    console.log(`The post '${name}' already exists in`)
+    const relativePath = path
+      .resolve(...exist.posts[0])
+      .replace(config.rootDir, '')
+      .replace('/index.asciidoc', '')
+    console.log(`The post '${name}' already exists in '${relativePath}'.`)
     console.log()
-    console.log(`'${path.resolve(...exist.posts[0])}'.`)
+    console.log(
+      `To publish the post '${name}', you can use update command insted.`
+    )
     return
   }
 
-  console.log(`Start to publish '${name}'.`)
+  console.log(`Preparing to publish '${name}'...`)
+
+  console.log()
+  console.log()
 
   const now = moment()
   const oldDir = path.resolve(config.draftsDir, name)
@@ -36,14 +49,13 @@ module.exports = async (name, config) => {
     now.format('YYYY/MM/DD'),
     name
   )
+  const relativeOldDir = oldDir.replace(config.rootDir, '')
+  const relativePublishDir = publishDir.replace(config.rootDir, '')
+
+  console.log(
+    `Moving the draft '${name}' from '${relativeOldDir}' into '${relativePublishDir}'...`
+  )
   await u.mkdirp(path.dirname(publishDir))
-
-  console.log()
-
-  console.log(`Moving the draft '${name}' from`)
-  console.log(`'${oldDir}'`)
-  console.log('into')
-  console.log(`'${publishDir}'...`)
   await u.rename(oldDir, publishDir)
 
   console.log()
@@ -57,7 +69,12 @@ module.exports = async (name, config) => {
   console.log()
   console.log()
 
-  console.log(`The post '${name}' has successfully published in`)
+  console.log(
+    `The post '${name}' has successfully published in '${relativePublishDir}'.`
+  )
+
   console.log()
-  console.log(`'${publishDir}'.`)
+  console.log()
+
+  console.log(`You can generate the JSON file of the posts data!`)
 }

@@ -5,11 +5,8 @@ const u = require('./utils')
 const pdu = require('./PostDraftUtils')
 
 module.exports = async config => {
-  console.log(
-    `start generating the posts data from '${path.resolve(
-      config.postsDir
-    )}/'...`
-  )
+  const relativePostsDir = config.postsDir.replace(config.rootDir, '')
+  console.log(`Generating the posts data from '${relativePostsDir}'...`)
 
   try {
     const posts = await pdu.readPosts(config.postsDir)
@@ -33,13 +30,11 @@ module.exports = async config => {
 
     console.log()
     console.log()
+
+    const relativeOutput = config.output.replace(config.rootDir, '')
     console.log(
-      `The posts data '${path.basename(
-        config.output
-      )}' has successfully created in`
+      `The posts data has successfully created in '${relativeOutput}'.`
     )
-    console.log()
-    console.log(`'${config.output}'.`)
   } catch (e) {
     console.log(`The command 'generate' failed with error:`)
     console.log()
