@@ -46,58 +46,50 @@ const mkdirp = async anyPath => {
 }
 
 const readdirRecursively = async (anyPath, depth = -1) => {
-  let splitedDirectoryPathList = []
-  let splitedAllPathList = []
+  let clearSplitedPathList = []
+  let unsearchedSplitedPathList = []
 
   {
     const base = path.resolve(anyPath)
-    splitedAllPathList = [[base]]
+    clearSplitedPathList.push([base])
 
     const stats = await stat(base)
     if (stats.isDirectory()) {
-      splitedDirectoryPathList = [[base]]
+      unsearchedSplitedPathList.push([base])
     }
   }
 
   for (let currentDepth = 0; currentDepth !== depth; currentDepth++) {
-    if (splitedDirectoryPathList.length === 0) {
+    if (unsearchedSplitedPathList.length === 0) {
       break
     }
 
     const directoryObjList = await Promise.all(
-      splitedDirectoryPathList.map(async splitedPath => {
+      unsearchedSplitedPathList.map(async splitedPath => {
         const dirList = await readdir(path.resolve(...splitedPath))
         const splitedPathList = dirList.map(dir => splitedPath.concat(dir))
 
-        const splitedCurrentDirectoryPathList = await filterP(
-          async splitedPath => {
-            const stats = await stat(path.resolve(...splitedPath))
-            return stats.isDirectory()
-          }
-        )(splitedPathList)
+        const splitedDirectoryPathList = await filterP(async splitedPath => {
+          const stats = await stat(path.resolve(...splitedPath))
+          return stats.isDirectory()
+        })(splitedPathList)
 
         return {
-          splitedPath,
           splitedPathList,
-          splitedDirectoryPathList: splitedCurrentDirectoryPathList,
+          splitedDirectoryPathList,
         }
       })
     )
 
-    splitedDirectoryPathList = []
+    unsearchedSplitedPathList = []
 
     directoryObjList.forEach(directoryObj => {
-      splitedAllPathList = splitedAllPathList.concat(
-        directoryObj.splitedPathList
-      )
-
-      splitedDirectoryPathList = splitedDirectoryPathList.concat(
-        directoryObj.splitedDirectoryPathList
-      )
+      clearSplitedPathList.push(...directoryObj.splitedPathList)
+      unsearchedSplitedPathList.push(...directoryObj.splitedDirectoryPathList)
     })
   }
 
-  return splitedAllPathList
+  return clearSplitedPathList
 }
 
 module.exports = {
