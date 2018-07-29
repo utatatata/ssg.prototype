@@ -2,63 +2,28 @@ const path = require('path')
 
 const u = require('./utils')
 
-const readDrafts = async dir => {
-  const splitedDraftPathList = (await u.readdir(dir)).map(draft => [dir, draft])
-
-  const splitedDocumentPathList = u.filterP(splitedPath =>
-    u
-      .access(path.resolve(...splitedPath))
-      .then(u.constantly(true))
-      .catch(u.constantly(false))
-  )(
-    splitedDraftPathList.map(splitedPath =>
-      splitedPath.concat('index.asciidoc')
-    )
-  )
-
-  return splitedDocumentPathList
+const readDrafts = async anyPath => {
+  const splitedPathList = await u.readdirRecursively(anyPath, 2)
+  return splitedPathList.filter(splitedPath => {
+    const [draftsDir, draftName, document] = splitedPath
+    return document === 'index.asciidoc'
+  })
 }
 
-const readPosts = async dir => {
-  const splitedYearPathList = (await u.readdir(dir))
-    .filter(year => year.match(/^\d+$/))
-    .map(year => [dir, year])
-
-  const splitedMonthPathList = (await Promise.all(
-    splitedYearPathList.map(async splitedPath => {
-      const monthDirList = await u.readdir(path.resolve(...splitedPath))
-      return monthDirList
-        .filter(month => month.match(/^0[1-9]|1[0-2]$/))
-        .map(month => splitedPath.concat(month))
-    })
-  )).reduce(u.concat, [])
-
-  const splitedDatePathList = (await Promise.all(
-    splitedMonthPathList.map(async splitedPath => {
-      const dateDirList = await u.readdir(path.resolve(...splitedPath))
-      return dateDirList
-        .filter(date => date.match(/^0[1-9]|[1-2][0-9]|3[01]$/))
-        .map(date => splitedPath.concat(date))
-    })
-  )).reduce(u.concat, [])
-
-  const splitedPostPathList = (await Promise.all(
-    splitedDatePathList.map(async splitedPath => {
-      const postDirList = await u.readdir(path.resolve(...splitedPath))
-      return postDirList.map(post => splitedPath.concat(post))
-    })
-  )).reduce(u.concat, [])
-
-  const splitedDocumentPathList = u.filterP(splitedPath =>
-    u
-      .access(path.resolve(...splitedPath))
-      .then(u.constantly(true))
-      .catch(u.constantly(false))
-  )(
-    splitedPostPathList.map(splitedPath => splitedPath.concat('index.asciidoc'))
-  )
-
-  return splitedDocumentPathList
+const readPosts = async anyPath => {
+  const splitedPathList = await u.readdirRecursively(anyPath, 5)
+  return splitedPathList.filter(splitedPath => {
+    const [postsDir, year, month, date, postName, document] = splitedPath
+    return (
+      year &&
+      year.match(/^\d+$/) &&
+      month &&
+      month.match(/^0[1-9]|1[0-2]$/) &&
+      date &&
+      date.match(/^0[1-9]|[1-2][0-9]|3[01]$/) &&
+      document === 'index.asciidoc'
+    )
+  })
 }
 
 const existFromDrafts = async (name, dir) => {
