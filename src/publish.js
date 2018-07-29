@@ -4,15 +4,7 @@ const moment = require('moment')
 
 const u = require('./utils')
 const pdu = require('./PostDraftUtils')
-
-const updateRevdate = (documentText, dateString) => {
-  const revdate = `:revdate: ${dateString}\n`
-  if (documentText.match(/^:revdate:/m)) {
-    return documentText.replace(/^:revdate:.*[\r?\n]/m, revdate)
-  } else {
-    return documentText.replace(/^:revnumber:/m, `${revdate}:revnumber:`)
-  }
-}
+const au = require('./asciidocUtils')
 
 module.exports = async (name, config) => {
   const exist = await pdu.exist(name, config.draftsDir, config.postsDir)
@@ -62,7 +54,7 @@ module.exports = async (name, config) => {
   console.log(`Updating revision date of the post '${name}'...`)
   const documentPath = path.resolve(publishDir, 'index.asciidoc')
   const text = (await u.readFile(documentPath)).toString()
-  const replacedText = updateRevdate(text, now.format())
+  const replacedText = au.updateRevdate(text, now.format())
   await u.writeFile(documentPath, replacedText)
 
   console.log()
