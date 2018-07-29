@@ -1,6 +1,8 @@
 const list = require('./list')
 const _new = require('./new')
 const publish = require('./publish')
+const edit = require('./edit')
+// const update = require('./update')
 const generate = require('./generate')
 const buildConfig = require('./buildConfig')
 const init = require('./init')
@@ -42,6 +44,26 @@ program
     const config = await buildConfig(options)
     await init(config)
     publish(name, config)
+  })
+
+program
+  .command('edit <name>')
+  .option('-d, --drafts-dir <drafts-dir>', 'Drafts dir')
+  .option('-p, --posts-dir <posts-dir>', 'Posts dir')
+  .action(async (name, options) => {
+    const config = await buildConfig(options)
+    await init(config)
+    edit(name, config)
+  })
+
+program
+  .command('update <name>')
+  .option('-d, --drafts-dir <drafts-dir>', 'Drafts dir')
+  .option('-p, --posts-dir <posts-dir>', 'Posts dir')
+  .action(async (name, options) => {
+    const config = await buildConfig(options)
+    await init(config)
+    // update(name, config)
   })
 
 program
