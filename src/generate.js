@@ -1,4 +1,5 @@
 const path = require('path')
+const fse = require('fs-extra')
 const asciidoctor = require('asciidoctor.js')()
 
 const u = require('./utils')
@@ -25,7 +26,7 @@ module.exports = async config => {
       }
     })
 
-    await u.mkdirp(path.dirname(config.output))
+    await fse.mkdirp(path.dirname(config.output))
     await u.writeFile(config.output, JSON.stringify(documentList, null, 2))
 
     console.log()

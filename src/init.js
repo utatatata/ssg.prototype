@@ -1,4 +1,4 @@
-const u = require('./utils')
+const fse = require('fs-extra')
 
 module.exports = config =>
-  Promise.all([u.mkdirp(config.draftsDir), u.mkdirp(config.postsDir)])
+  Promise.all([fse.mkdirp(config.draftsDir), fse.mkdirp(config.postsDir)])

@@ -1,5 +1,5 @@
 const path = require('path')
-
+const fse = require('fs-extra')
 const u = require('./utils')
 const pdu = require('./PostDraftUtils')
 const template = require('./template')
@@ -31,7 +31,7 @@ module.exports = async (name, config) => {
   console.log(`Creating the draft '${name}'...`)
 
   const draftPath = path.resolve(config.draftsDir, name)
-  await u.mkdirp(draftPath)
+  await fse.mkdirp(draftPath)
   await u.writeFile(
     path.resolve(draftPath, 'index.asciidoc'),
     template(

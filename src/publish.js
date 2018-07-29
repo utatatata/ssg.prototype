@@ -1,5 +1,5 @@
 const path = require('path')
-
+const fse = require('fs-extra')
 const moment = require('moment')
 
 const u = require('./utils')
@@ -55,8 +55,7 @@ module.exports = async (name, config) => {
   console.log(
     `Moving the draft '${name}' from '${relativeOldDir}' into '${relativePublishDir}'...`
   )
-  await u.mkdirp(path.dirname(publishDir))
-  await u.rename(oldDir, publishDir)
+  await fse.move(oldDir, publishDir)
 
   console.log()
 

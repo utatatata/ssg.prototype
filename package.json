@@ -17,6 +17,7 @@
   "dependencies": {
     "asciidoctor.js": "^1.5.7-rc.1",
     "commander": "^2.16.0",
+    "fs-extra": "^7.0.0",
     "moment": "^2.22.2",
     "pkg-dir": "^3.0.0"
   }
