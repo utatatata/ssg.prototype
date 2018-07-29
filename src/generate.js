@@ -2,7 +2,7 @@ const path = require('path')
 const asciidoctor = require('asciidoctor.js')()
 
 const u = require('./utils')
-const fsu = require('./fsUtils')
+const pdu = require('./PostDraftUtils')
 
 module.exports = async config => {
   console.log(
@@ -12,7 +12,7 @@ module.exports = async config => {
   )
 
   try {
-    const posts = await fsu.readPosts(config.postsDir)
+    const posts = await pdu.readPosts(config.postsDir)
 
     const documentList = posts.map(splitedPath => {
       const document = asciidoctor.loadFile(path.resolve(...splitedPath))

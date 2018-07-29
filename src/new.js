@@ -1,11 +1,11 @@
 const path = require('path')
 
 const u = require('./utils')
-const fsu = require('./fsUtils')
+const pdu = require('./PostDraftUtils')
 const template = require('./template')
 
 module.exports = async (name, config) => {
-  const exist = await fsu.exist(name, config.draftsDir, config.postsDir)
+  const exist = await pdu.exist(name, config.draftsDir, config.postsDir)
 
   if (exist.drafts.length !== 0) {
     console.log(`The draft '${name}' already exists in`)

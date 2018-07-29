@@ -3,7 +3,7 @@ const path = require('path')
 const moment = require('moment')
 
 const u = require('./utils')
-const fsu = require('./fsUtils')
+const pdu = require('./PostDraftUtils')
 
 const updateRevdate = (documentText, dateString) => {
   const revdate = `:revdate: ${dateString}\n`
@@ -15,7 +15,7 @@ const updateRevdate = (documentText, dateString) => {
 }
 
 module.exports = async (name, config) => {
-  const exist = await fsu.exist(name, config.draftsDir, config.postsDir)
+  const exist = await pdu.exist(name, config.draftsDir, config.postsDir)
   if (exist.drafts.length === 0) {
     console.log(`The draft '${name}' doesn't exist.`)
     return
