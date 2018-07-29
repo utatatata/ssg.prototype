@@ -1,4 +1,5 @@
 const fs = require('fs')
+const fse = require('fs-extra')
 const path = require('path')
 const util = require('util')
 
@@ -31,19 +32,7 @@ const filterP = predicate => async xs => {
 const readdir = util.promisify(fs.readdir)
 const readFile = util.promisify(fs.readFile)
 const writeFile = util.promisify(fs.writeFile)
-const access = util.promisify(fs.access)
-const mkdir = util.promisify(fs.mkdir)
-const rename = util.promisify(fs.rename)
 const stat = util.promisify(fs.stat)
-
-const mkdirp = async anyPath => {
-  const splitedPath = path.resolve(anyPath).split(path.sep)
-  let currentPath = '/'
-  for (const piece of splitedPath) {
-    currentPath = path.resolve(currentPath, piece)
-    await mkdir(currentPath).catch(identity)
-  }
-}
 
 const readdirRecursively = async (anyPath, depth = -1) => {
   let clearSplitedPathList = []
@@ -110,10 +99,6 @@ module.exports = {
   readdir,
   readFile,
   writeFile,
-  access,
-  mkdir,
-  rename,
   stat,
-  mkdirp,
   readdirRecursively,
 }
