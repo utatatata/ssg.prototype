@@ -1,13 +1,13 @@
 const path = require('path')
 const moment = require('moment')
 
-const fsu = require('./fsUtils')
+const pdu = require('./PostDraftUtils')
 
 module.exports = async config => {
   try {
     const [drafts, posts] = await Promise.all([
-      fsu.readDrafts(config.draftsDir),
-      fsu.readPosts(config.postsDir),
+      pdu.readDrafts(config.draftsDir),
+      pdu.readPosts(config.postsDir),
     ])
 
     const sortedPosts = Array.isArray(posts)
