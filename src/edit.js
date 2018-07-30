@@ -1,7 +1,7 @@
 const path = require('path')
 const fse = require('fs-extra')
 const u = require('./utils')
-const pdu = require('./PostDraftUtils')
+const pdu = require('./postDraftUtils')
 const template = require('./template')
 
 module.exports = async (name, config) => {
