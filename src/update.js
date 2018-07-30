@@ -11,17 +11,24 @@ module.exports = async (name, config) => {
 
   if (exist.drafts.length === 0) {
     const relativePath = config.draftsDir.replace(config.rootDir, '')
-    console.log(`The draft '${name}' doesn't exist in '${relativePath}'.`)
-    console.log()
-    console.log(`To create new draft '${name}', you can use new command.`)
+    if (exist.posts.length === 0) {
+      console.log(`The new draft '${name}' doesn't exist in '${relativePath}'.`)
+      console.log()
+      console.log(`You can use new command to create the new draft '${name}'.`)
+    } else {
+      console.log(
+        `The update draft '${name}' doesn't exist in '${relativePath}'.`
+      )
+      console.log()
+      console.log(`You can use edit command to edit the post '${name}'.`)
+    }
     return
-  }
-  if (exist.posts.length === 0) {
+  } else if (exist.posts.length === 0) {
     const relativePath = config.postsDir.replace(config.rootDir, '')
     console.log(`The post '${name}' doesn't exist in '${relativePath}'.`)
     console.log()
     console.log(
-      `To publish the post '${name}', you can use update command insted.`
+      `You can use publish command insted to publish the draft '${name}'.`
     )
     return
   }
@@ -46,21 +53,26 @@ module.exports = async (name, config) => {
     const draftRev = au.getRevnumber(draft)
     if (!(au.compareRevnumber(draftRev, postRev) > 0)) {
       console.log(
-        `revnumber of the update draft '${name}' must be larger than that of the post.`
+        `The revnumber of the update draft '${name}' must be larger than that of the post.`
       )
+      console.log()
       console.log(`draft revision: ${draftRev.str}`)
       console.log(`post revision: ${postRev.str}`)
       return
     }
   }
 
+  console.log(`Removing the current post '${name}' in '${relativePostDir}'...`)
+  await fse.remove(postDir)
+  console.log()
   console.log(
     `Moving the draft '${name}' from '${relativeDraftDir}' into '${relativePostDir}'...`
   )
-  await fse.remove(postDir)
   await fse.move(draftDir, postDir)
 
-  console.log(`Updating revision date of the post '${name}'...`)
+  console.log()
+
+  console.log(`Updating the revision date of the post '${name}'...`)
   const now = moment()
   const text = (await u.readFile(postDocumentPath)).toString()
   const replacedText = au.updateRevdate(text, now.format())
@@ -68,13 +80,11 @@ module.exports = async (name, config) => {
 
   console.log()
   console.log()
+  console.log()
 
   console.log(
     `The post '${name}' has successfully updated in '${relativePostDir}'.`
   )
-
   console.log()
-  console.log()
-
-  console.log(`You can generate the JSON file of the posts data!`)
+  console.log(`You can generate the posts data JSON from the posts!`)
 }

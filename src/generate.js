@@ -7,7 +7,9 @@ const pdu = require('./postDraftUtils')
 
 module.exports = async config => {
   const relativePostsDir = config.postsDir.replace(config.rootDir, '')
-  console.log(`Generating the posts data from '${relativePostsDir}'...`)
+  console.log(
+    `Generating the posts data JSON from the posts in '${relativePostsDir}'...`
+  )
 
   try {
     const posts = await pdu.readPosts(config.postsDir)
@@ -31,10 +33,11 @@ module.exports = async config => {
 
     console.log()
     console.log()
+    console.log()
 
     const relativeOutput = config.output.replace(config.rootDir, '')
     console.log(
-      `The posts data has successfully created in '${relativeOutput}'.`
+      `The posts data JSON has successfully created in '${relativeOutput}'.`
     )
   } catch (e) {
     console.log(`The command 'generate' failed with error:`)
