@@ -44,7 +44,11 @@ npm i -g ssg-prototype
      │   └── bar.png
 ```
 
+The directories `posts/` and `drafts/` is created at first time you execute the any command.
+
 The path `YYYY/MM/DD` represents the publish date of the post.
+
+About `ssgconfig.json`, see [Configuration](#configuration).
 
 
 ## Usage
@@ -116,10 +120,21 @@ author <email>
 
 The header of Asciidoc is required.
 
+- title
+
+- author (optinal email)
+
 - revnumber
 
 This attribute is required.
 
+- tags
+
+- summary
+
+- toc
+
+Table of contents.
 
 
 ## Configuration
@@ -130,7 +145,7 @@ Every command option can be specified in `./ssgconfig.json`.
 {
   "posts-dir": "src/posts",   // default is "./posts"
   "drafts-dir": "src/drafts", // default is "./drafts"
-  "author": "utakuma"         // default is ""
+  "author": "utakuma"         // default is "author"
 }
 ```
 
