@@ -21,19 +21,15 @@ module.exports = async (name, config) => {
     )
 
     if (exist.drafts.length === 0) {
+      console.log(
+        `The draft '${name}' doesn't exist in '${draftPaths.relativeDir}'.`
+      )
+      console.log()
       if (exist.posts.length === 0) {
-        console.log(
-          `The new draft '${name}' doesn't exist in '${draftPaths.dir}'.`
-        )
-        console.log()
         console.log(
           `You can use new command to create the new draft '${name}'.`
         )
       } else {
-        console.log(
-          `The update draft '${name}' doesn't exist in '${draftPaths.dir}'.`
-        )
-        console.log()
         console.log(`You can use edit command to edit the post '${name}'.`)
       }
       return
@@ -48,7 +44,9 @@ module.exports = async (name, config) => {
         date
       )
       console.log(
-        `The post '${name}' already exists in '${currentPostPaths.dir}'.`
+        `The post '${name}' already exists in '${
+          currentPostPaths.relativeDir
+        }'.`
       )
       console.log()
       console.log(
@@ -96,7 +94,7 @@ module.exports = async (name, config) => {
       )).toString()
       console.log(`Updating the revision date of the post '${name}'...`)
       const replacedPostDocumentText = au.updateRevdate(
-        postDocumentText,
+        au.updatePublishdate(postDocumentText, now.format()),
         now.format()
       )
       await u.writeFile(postPaths.documentPath, replacedPostDocumentText)

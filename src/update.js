@@ -9,34 +9,17 @@ module.exports = async (name, config) => {
   try {
     const exist = await pdu.exist(name, config.draftsDir, config.postsDir)
     const draftPaths = pdu.draftPaths(name, config.draftsDir, config.rootDir)
-    const [, year, month, date, ,] = exist.posts[0]
-    const postPaths = pdu.postPaths(
-      name,
-      config.postsDir,
-      config.rootDir,
-      year,
-      month,
-      date
-    )
 
     if (exist.drafts.length === 0) {
+      console.log(
+        `The draft '${name}' doesn't exist in '${config.relativeDraftsDir}'.`
+      )
+      console.log()
       if (exist.posts.length === 0) {
-        console.log(
-          `The new draft '${name}' doesn't exist in '${
-            config.relativeDraftsDir
-          }'.`
-        )
-        console.log()
         console.log(
           `You can use new command to create the new draft '${name}'.`
         )
       } else {
-        console.log(
-          `The update draft '${name}' doesn't exist in '${
-            config.relativeDraftsDir
-          }'.`
-        )
-        console.log()
         console.log(`You can use edit command to edit the post '${name}'.`)
       }
       return
@@ -51,12 +34,15 @@ module.exports = async (name, config) => {
       return
     }
 
-    const draftDocumentText = (await u.readFile(
-      draftPaths.documentPath
-    )).toString()
-    const postDocumentText = (await u.readFile(
-      postPaths.documentPath
-    )).toString()
+    const [, year, month, date, ,] = exist.posts[0]
+    const postPaths = pdu.postPaths(
+      name,
+      config.postsDir,
+      config.rootDir,
+      year,
+      month,
+      date
+    )
 
     console.log(`Preparing to update '${name}'...`)
 
@@ -64,6 +50,13 @@ module.exports = async (name, config) => {
     console.log()
 
     {
+      const draftDocumentText = (await u.readFile(
+        draftPaths.documentPath
+      )).toString()
+      const postDocumentText = (await u.readFile(
+        postPaths.documentPath
+      )).toString()
+
       const postRev = au.getRevnumber(postDocumentText)
       const draftRev = au.getRevnumber(draftDocumentText)
       if (postRev === null || draftRev === null) {
@@ -83,8 +76,8 @@ module.exports = async (name, config) => {
           `The revnumber of the update draft '${name}' must be larger than that of the post.`
         )
         console.log()
-        console.log(`draft revision: ${draftRev.str}`)
-        console.log(`post revision: ${postRev.str}`)
+        console.log(`draft revision: v${draftRev.str}`)
+        console.log(`post revision: v${postRev.str}`)
         return
       }
     }
@@ -105,6 +98,9 @@ module.exports = async (name, config) => {
 
     console.log(`Updating the revision date of the post '${name}'...`)
     {
+      const postDocumentText = (await u.readFile(
+        postPaths.documentPath
+      )).toString()
       const now = moment()
       const replacedPostDocumentText = au.updateRevdate(
         postDocumentText,

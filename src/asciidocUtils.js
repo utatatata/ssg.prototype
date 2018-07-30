@@ -1,3 +1,12 @@
+const updatePublishdate = (documentText, dateString) => {
+  const publishdate = `:publishdate: ${dateString}\n`
+  if (documentText.match(/^:publishdate:/m)) {
+    return documentText.replace(/^:publishdate:.*[\r?\n]/m, publishdate)
+  } else {
+    return documentText.replace(/^:revnumber:/m, `${publishdate}:revnumber:`)
+  }
+}
+
 const updateRevdate = (documentText, dateString) => {
   const revdate = `:revdate: ${dateString}\n`
   if (documentText.match(/^:revdate:/m)) {
@@ -46,6 +55,7 @@ const compareRevnumber = (rev1, rev2) => {
 }
 
 module.exports = {
+  updatePublishdate,
   updateRevdate,
   getRevnumber,
   compareRevnumber,
