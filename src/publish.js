@@ -3,7 +3,7 @@ const fse = require('fs-extra')
 const moment = require('moment')
 
 const u = require('./utils')
-const pdu = require('./PostDraftUtils')
+const pdu = require('./postDraftUtils')
 const au = require('./asciidocUtils')
 
 module.exports = async (name, config) => {

@@ -3,7 +3,7 @@ const fse = require('fs-extra')
 const asciidoctor = require('asciidoctor.js')()
 
 const u = require('./utils')
-const pdu = require('./PostDraftUtils')
+const pdu = require('./postDraftUtils')
 
 module.exports = async config => {
   const relativePostsDir = config.postsDir.replace(config.rootDir, '')

@@ -1,7 +1,7 @@
 const path = require('path')
 const moment = require('moment')
 
-const pdu = require('./PostDraftUtils')
+const pdu = require('./postDraftUtils')
 
 module.exports = async config => {
   try {
