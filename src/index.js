@@ -7,14 +7,23 @@ const generate = require('./generate')
 const buildConfig = require('./buildConfig')
 const init = require('./init')
 
+const defaultConfig = require('./defaultConfig')
+
 const program = require('commander')
 
 program.version('v1.0.0', '-v, --version')
 
 program
   .command('list')
-  .option('-d, --drafts-dir <drafts-dir>', 'Drafts dir')
-  .option('-p, --posts-dir <posts-dir>', 'Posts dir')
+  .description('display the list of the posts and the drafts')
+  .option(
+    '-d, --drafts-dir <drafts-dir>',
+    `the drafts dir, default is '${defaultConfig.draftsDir}'`
+  )
+  .option(
+    '-p, --posts-dir <posts-dir>',
+    `the posts dir, default is '${defaultConfig.postsDir}'`
+  )
   .action(async options => {
     const config = await buildConfig(options)
     await init(config)
@@ -23,13 +32,32 @@ program
 
 program
   .command('new <name>')
-  .option('-d, --drafts-dir <drafts-dir>', 'Drafts dir')
-  .option('-p, --posts-dir <posts-dir>', 'Posts dir')
-  .option('-a, --author <author>', 'author')
-  .option('-e, --email <email>', 'Email')
-  .option('-r --revnumber, -- <revnumber>', 'Revision number')
-  .option('-t, --tags <tags>', 'Tag list')
-  .option('-s, --summary <summary>', 'Summary')
+  .description('create a new draft')
+  .option(
+    '-d, --drafts-dir <drafts-dir>',
+    `the drafts dir, default is '${defaultConfig.draftsDir}'`
+  )
+  .option(
+    '-p, --posts-dir <posts-dir>',
+    `the posts dir, default is '${defaultConfig.postsDir}'`
+  )
+  .option(
+    '-a, --author <author>',
+    `author, default is '${defaultConfig.author}'`
+  )
+  .option('-e, --email <email>', `Email, default is '${defaultConfig.email}'`)
+  .option(
+    '-r --revnumber, -- <revnumber>',
+    `revision number, default is '${defaultConfig.revnumber}'`
+  )
+  .option(
+    '-t, --tags <tags>',
+    `tag list e.g. 'JavaScript, Node', default is '${defaultConfig.tags}'`
+  )
+  .option(
+    '-s, --summary <summary>',
+    `summary, default is '${defaultConfig.summary}'`
+  )
   .action(async (name, options) => {
     const config = await buildConfig(options)
     await init(config)
@@ -38,8 +66,15 @@ program
 
 program
   .command('publish <name>')
-  .option('-d, --drafts-dir <drafts-dir>', 'Drafts dir')
-  .option('-p, --posts-dir <posts-dir>', 'Posts dir')
+  .description('publish the new draft')
+  .option(
+    '-d, --drafts-dir <drafts-dir>',
+    `the drafts dir, default is '${defaultConfig.draftsDir}'`
+  )
+  .option(
+    '-p, --posts-dir <posts-dir>',
+    `the posts dir, default is '${defaultConfig.postsDir}'`
+  )
   .action(async (name, options) => {
     const config = await buildConfig(options)
     await init(config)
@@ -48,8 +83,15 @@ program
 
 program
   .command('edit <name>')
-  .option('-d, --drafts-dir <drafts-dir>', 'Drafts dir')
-  .option('-p, --posts-dir <posts-dir>', 'Posts dir')
+  .description('create a udpate draft to edit the post')
+  .option(
+    '-d, --drafts-dir <drafts-dir>',
+    `the drafts dir, default is '${defaultConfig.draftsDir}'`
+  )
+  .option(
+    '-p, --posts-dir <posts-dir>',
+    `the posts dir, default is '${defaultConfig.postsDir}'`
+  )
   .action(async (name, options) => {
     const config = await buildConfig(options)
     await init(config)
@@ -58,8 +100,15 @@ program
 
 program
   .command('update <name>')
-  .option('-d, --drafts-dir <drafts-dir>', 'Drafts dir')
-  .option('-p, --posts-dir <posts-dir>', 'Posts dir')
+  .description('publish the update draft to update the post')
+  .option(
+    '-d, --drafts-dir <drafts-dir>',
+    `the drafts dir, default is '${defaultConfig.draftsDir}'`
+  )
+  .option(
+    '-p, --posts-dir <posts-dir>',
+    `the posts dir, default is '${defaultConfig.postsDir}'`
+  )
   .action(async (name, options) => {
     const config = await buildConfig(options)
     await init(config)
@@ -68,8 +117,15 @@ program
 
 program
   .command('generate')
-  .option('-p, --posts-dir <posts-dir>', 'Posts dir')
-  .option('-o, --output <output>', 'Output file name')
+  .description('generate the posts data JSON from the posts')
+  .option(
+    '-p, --posts-dir <posts-dir>',
+    `the posts dir, default is '${defaultConfig.postsDir}'`
+  )
+  .option(
+    '-o, --output <output>',
+    `output file path, default is '${defaultConfig.output}'`
+  )
   .action(async options => {
     const config = await buildConfig(options)
     await init(config)

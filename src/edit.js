@@ -7,23 +7,32 @@ const template = require('./template')
 module.exports = async (name, config) => {
   const exist = await pdu.exist(name, config.draftsDir, config.postsDir)
 
-  if (exist.posts.length === 0) {
-    const relativePath = config.postsDir.replace(config.rootDir, '')
-    console.log(`The post '${name}' doesn't exist in '${relativePath}'.`)
-    console.log()
-    console.log(
-      `To create the new draft '${name}', you can use new command instead.`
-    )
-    return
-  }
   if (exist.drafts.length !== 0) {
     const relativePath = path
       .resolve(...exist.drafts[0])
       .replace(config.rootDir, '')
       .replace('/index.asciidoc', '')
-    console.log(`The draft '${name}' already exists in '${relativePath}'.`)
+    if (exist.posts.length !== 0) {
+      console.log(
+        `The update draft '${name}' already exists in '${relativePath}'.`
+      )
+      console.log()
+      console.log(`You can edit the index.asciidoc and update them.`)
+    } else {
+      console.log(
+        `The new draft '${name}' already exists in '${relativePath}'.`
+      )
+      console.log()
+      console.log(`You can edit the index.asciidoc and publish them.`)
+    }
+    return
+  } else if (exist.posts.length === 0) {
+    const relativePath = config.postsDir.replace(config.rootDir, '')
+    console.log(`The post '${name}' doesn't exist in '${relativePath}'.`)
     console.log()
-    console.log(`You can edit the index.asciidoc and update them.`)
+    console.log(
+      `You can use new command instead to create the new draft '${name}'.`
+    )
     return
   }
 
@@ -35,6 +44,9 @@ module.exports = async (name, config) => {
   const relativePostDir = postDir.replace(config.rootDir, '')
   const relativeDraftDir = draftDir.replace(config.rootDir, '')
 
+  console.log()
+  console.log()
+
   console.log(
     `Copying the post '${name}' from '${relativePostDir}' into '${relativeDraftDir}'...`
   )
@@ -42,13 +54,11 @@ module.exports = async (name, config) => {
 
   console.log()
   console.log()
+  console.log()
 
   console.log(
-    `The draft '${name}' has successfully created in '${relativeDraftDir}'.`
+    `The update draft '${name}' has successfully created in '${relativeDraftDir}'.`
   )
-
   console.log()
-  console.log()
-
   console.log(`You can edit the index.asciidoc and update them!`)
 }

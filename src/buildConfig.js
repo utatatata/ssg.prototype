@@ -1,16 +1,7 @@
 const path = require('path')
 const pkgDir = require('pkg-dir')
 
-const defaultConfig = {
-  draftsDir: './drafts',
-  postsDir: './posts',
-  author: '',
-  email: '',
-  revnumber: 'v1.0.0',
-  tags: '',
-  summary: '',
-  output: './posts.json',
-}
+const defaultConfig = require('./defaultConfig')
 
 const parseTags = tags => (tags ? tags.split(',') : [])
 
