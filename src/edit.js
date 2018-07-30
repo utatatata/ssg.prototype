@@ -1,64 +1,78 @@
-const path = require('path')
 const fse = require('fs-extra')
-const u = require('./utils')
+
 const pdu = require('./postDraftUtils')
-const template = require('./template')
 
 module.exports = async (name, config) => {
-  const exist = await pdu.exist(name, config.draftsDir, config.postsDir)
+  try {
+    const exist = await pdu.exist(name, config.draftsDir, config.postsDir)
+    const draftPaths = pdu.draftPaths(name, config.draftsDir, config.rootDir)
 
-  if (exist.drafts.length !== 0) {
-    const relativePath = path
-      .resolve(...exist.drafts[0])
-      .replace(config.rootDir, '')
-      .replace('/index.asciidoc', '')
-    if (exist.posts.length !== 0) {
+    if (exist.drafts.length !== 0) {
+      if (exist.posts.length !== 0) {
+        console.log(
+          `The update draft '${name}' already exists in '${
+            draftPaths.relativeDir
+          }'.`
+        )
+        console.log()
+        console.log(`You can edit the index.asciidoc and update them.`)
+      } else {
+        console.log(
+          `The new draft '${name}' already exists in '${
+            draftPaths.relativeDir
+          }'.`
+        )
+        console.log()
+        console.log(`You can edit the index.asciidoc and publish them.`)
+      }
+      return
+    } else if (exist.posts.length === 0) {
       console.log(
-        `The update draft '${name}' already exists in '${relativePath}'.`
+        `The post '${name}' doesn't exist in '${config.relativePostsDir}'.`
       )
       console.log()
-      console.log(`You can edit the index.asciidoc and update them.`)
-    } else {
       console.log(
-        `The new draft '${name}' already exists in '${relativePath}'.`
+        `You can use new command instead to create the new draft '${name}'.`
       )
-      console.log()
-      console.log(`You can edit the index.asciidoc and publish them.`)
+      return
     }
-    return
-  } else if (exist.posts.length === 0) {
-    const relativePath = config.postsDir.replace(config.rootDir, '')
-    console.log(`The post '${name}' doesn't exist in '${relativePath}'.`)
-    console.log()
-    console.log(
-      `You can use new command instead to create the new draft '${name}'.`
+
+    const [, year, month, date, ,] = exist.posts[0]
+    const postPaths = pdu.postPaths(
+      name,
+      config.postsDir,
+      config.rootDir,
+      year,
+      month,
+      date
     )
-    return
+
+    console.log(`Creating the draft '${name}'...`)
+
+    console.log()
+    console.log()
+
+    console.log(
+      `Copying the post '${name}' from '${postPaths.relativeDir}' into '${
+        draftPaths.relativeDir
+      }'...`
+    )
+    fse.copy(postPaths.dir, draftPaths.dir)
+
+    console.log()
+    console.log()
+    console.log()
+
+    console.log(
+      `The update draft '${name}' has successfully created in '${
+        draftPaths.relativeDir
+      }'.`
+    )
+    console.log()
+    console.log(`You can edit the index.asciidoc and update them!`)
+  } catch (e) {
+    console.log(`The command 'edit' failed with error:`)
+    console.log()
+    console.log(e)
   }
-
-  console.log(`Creating the draft '${name}'...`)
-
-  const [, year, month, date, ,] = exist.posts[0]
-  const postDir = path.resolve(config.postsDir, year, month, date, name)
-  const draftDir = path.resolve(config.draftsDir, name)
-  const relativePostDir = postDir.replace(config.rootDir, '')
-  const relativeDraftDir = draftDir.replace(config.rootDir, '')
-
-  console.log()
-  console.log()
-
-  console.log(
-    `Copying the post '${name}' from '${relativePostDir}' into '${relativeDraftDir}'...`
-  )
-  fse.copy(postDir, draftDir)
-
-  console.log()
-  console.log()
-  console.log()
-
-  console.log(
-    `The update draft '${name}' has successfully created in '${relativeDraftDir}'.`
-  )
-  console.log()
-  console.log(`You can edit the index.asciidoc and update them!`)
 }

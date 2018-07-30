@@ -6,15 +6,16 @@ const u = require('./utils')
 const pdu = require('./postDraftUtils')
 
 module.exports = async config => {
-  const relativePostsDir = config.postsDir.replace(config.rootDir, '')
-  console.log(
-    `Generating the posts data JSON from the posts in '${relativePostsDir}'...`
-  )
-
   try {
-    const posts = await pdu.readPosts(config.postsDir)
+    console.log(
+      `Generating the posts data JSON from the posts in '${
+        config.relativePostsDir
+      }'...`
+    )
 
-    const documentList = posts.map(splitedPath => {
+    const splitedPostPathList = await pdu.readPosts(config.postsDir)
+
+    const documentList = splitedPostPathList.map(splitedPath => {
       const document = asciidoctor.loadFile(path.resolve(...splitedPath))
       return {
         title: document.getAttribute('doctitle'),
@@ -35,9 +36,10 @@ module.exports = async config => {
     console.log()
     console.log()
 
-    const relativeOutput = config.output.replace(config.rootDir, '')
     console.log(
-      `The posts data JSON has successfully created in '${relativeOutput}'.`
+      `The posts data JSON has successfully created in '${
+        config.relativeOutput
+      }'.`
     )
   } catch (e) {
     console.log(`The command 'generate' failed with error:`)

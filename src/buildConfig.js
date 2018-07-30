@@ -5,17 +5,34 @@ const defaultConfig = require('./defaultConfig')
 
 const parseTags = tags => (tags ? tags.split(',') : [])
 
-const overwrite = (rootDir, config, options) => ({
-  rootDir,
-  draftsDir: path.resolve(rootDir, options.draftsDir || config.draftsDir),
-  postsDir: path.resolve(rootDir, options.postsDir || config.postsDir),
-  author: options.author || config.author,
-  email: options.email || config.email,
-  revnumber: options.revnumber || config.revnumber,
-  tags: parseTags(options.tags || config.tags),
-  summary: options.summary || config.summary,
-  output: path.resolve(rootDir, options.output || config.output),
-})
+const overwrite = (rootDir, config, options) => {
+  const draftsDir = path.resolve(rootDir, options.draftsDir || config.draftsDir)
+  const postsDir = path.resolve(rootDir, options.postsDir || config.postsDir)
+  const relativeDraftsDir = path.relative(rootDir, draftsDir)
+  const relativePostsDir = path.relative(rootDir, postsDir)
+  const author = options.author || config.author
+  const email = options.email || config.email
+  const revnumber = options.revnumber || config.revnumber
+  const tags = parseTags(options.tags || config.tags)
+  const summary = options.summary || config.summary
+  const output = path.resolve(rootDir, options.output || config.output)
+  const relativeOutput = output === '' ? path.relative(rootDir, output) : ''
+
+  return {
+    rootDir,
+    draftsDir,
+    postsDir,
+    relativeDraftsDir,
+    relativePostsDir,
+    author,
+    email,
+    revnumber,
+    tags,
+    summary,
+    output,
+    relativeOutput,
+  }
+}
 
 module.exports = async options => {
   const rootDir = await pkgDir(process.cwd())
