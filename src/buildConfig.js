@@ -16,7 +16,7 @@ const overwrite = (rootDir, config, options) => {
   const tags = parseTags(options.tags || config.tags)
   const summary = options.summary || config.summary
   const output = path.resolve(rootDir, options.output || config.output)
-  const relativeOutput = output === '' ? path.relative(rootDir, output) : ''
+  const relativeOutput = path.relative(rootDir, output)
 
   return {
     rootDir,

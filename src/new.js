@@ -12,7 +12,9 @@ module.exports = async (name, config) => {
     if (exist.drafts.length !== 0) {
       if (exist.posts.length === 0) {
         console.log(
-          `The draft '${name}' already exists in '${draftPaths.relativeDir}'.`
+          `The new draft '${name}' already exists in '${
+            draftPaths.relativeDir
+          }'.`
         )
         console.log()
         console.log(`You can edit the index.asciidoc and publish them.`)

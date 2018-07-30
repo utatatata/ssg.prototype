@@ -15,12 +15,14 @@ module.exports = async config => {
 
     const splitedPostPathList = await pdu.readPosts(config.postsDir)
 
-    const documentList = splitedPostPathList.map(splitedPath => {
-      const document = asciidoctor.loadFile(path.resolve(...splitedPath))
+    const documentJSONList = splitedPostPathList.map(splitedPath => {
+      const document = asciidoctor.loadFile(path.join(...splitedPath))
       return {
+        path: splitedPath,
         title: document.getAttribute('doctitle'),
         author: document.getAttribute('author'),
         email: document.getAttribute('email'),
+        publishdate: document.getAttribute('publishdate'),
         revnumber: document.getAttribute('revnumber'),
         revdate: document.getAttribute('revdate'),
         tags: document.getAttribute('tags'),
@@ -30,7 +32,7 @@ module.exports = async config => {
     })
 
     await fse.mkdirp(path.dirname(config.output))
-    await u.writeFile(config.output, JSON.stringify(documentList, null, 2))
+    await u.writeFile(config.output, JSON.stringify(documentJSONList, null, 2))
 
     console.log()
     console.log()
