@@ -45,12 +45,26 @@ module.exports = async (name, config) => {
   const relativeDraftDir = draftDir.replace(config.rootDir, '')
   const postDocumentPath = path.resolve(postDir, 'index.asciidoc')
   const draftDocumentPath = path.resolve(draftDir, 'index.asciidoc')
+  const relativeDraftDocumentPath = draftDocumentPath.replace(
+    config.rootDir,
+    ''
+  )
 
   {
     const post = (await u.readFile(postDocumentPath)).toString()
     const draft = (await u.readFile(draftDocumentPath)).toString()
     const postRev = au.getRevnumber(post)
     const draftRev = au.getRevnumber(draft)
+    if (postRev === null || draftRev === null) {
+      console.log(
+        `The attribute revnumber is required in '${relativeDraftDocumentPath}'`
+      )
+      console.log()
+      console.log(
+        `Please add revnumber (e.g. ':revnumber: v1.0.0') into the header of the document.`
+      )
+      return
+    }
     if (!(au.compareRevnumber(draftRev, postRev) > 0)) {
       console.log(
         `The revnumber of the update draft '${name}' must be larger than that of the post.`
