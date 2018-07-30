@@ -36,40 +36,57 @@ module.exports = async (name, config) => {
     return
   }
 
+  const now = moment()
+  const draftDir = path.resolve(config.draftsDir, name)
+  const postDir = path.resolve(config.postsDir, now.format('YYYY/MM/DD'), name)
+  const relativeDraftDir = draftDir.replace(config.rootDir, '')
+  const relativePostDir = postDir.replace(config.rootDir, '')
+  const draftDocumentPath = path.resolve(draftDir, 'index.asciidoc')
+  const postDocumentPath = path.resolve(postDir, 'index.asciidoc')
+  const relativeDraftDocumentPath = draftDocumentPath
+    .replace(config.rootDir, '')
+    .replace('index.asciidoc', '')
+  const draftText = (await u.readFile(draftDocumentPath)).toString()
+
   console.log(`Preparing to publish '${name}'...`)
 
   console.log()
   console.log()
 
-  const now = moment()
-  const oldDir = path.resolve(config.draftsDir, name)
-  const publishDir = path.resolve(
-    config.postsDir,
-    now.format('YYYY/MM/DD'),
-    name
-  )
-  const relativeOldDir = oldDir.replace(config.rootDir, '')
-  const relativePublishDir = publishDir.replace(config.rootDir, '')
+  {
+    const rev = au.getRevnumber(draftText)
+    if (rev === null) {
+      console.log(
+        `The attribute revnumber is required in '${relativeDraftDocumentPath}'`
+      )
+      console.log()
+      console.log(
+        `Please add revnumber (e.g. ':revnumber: v1.0.0') into the header of the document.`
+      )
+      return
+    }
+  }
 
   console.log(
-    `Moving the draft '${name}' from '${relativeOldDir}' into '${relativePublishDir}'...`
+    `Moving the draft '${name}' from '${relativeDraftDir}' into '${relativePostDir}'...`
   )
-  await fse.move(oldDir, publishDir)
+  await fse.move(draftDir, postDir)
 
   console.log()
 
-  console.log(`Updating the revision date of the post '${name}'...`)
-  const documentPath = path.resolve(publishDir, 'index.asciidoc')
-  const text = (await u.readFile(documentPath)).toString()
-  const replacedText = au.updateRevdate(text, now.format())
-  await u.writeFile(documentPath, replacedText)
+  {
+    const postText = (await u.readFile(postDocumentPath)).toString()
+    console.log(`Updating the revision date of the post '${name}'...`)
+    const replacedPostText = au.updateRevdate(postText, now.format())
+    await u.writeFile(postDocumentPath, replacedPostText)
+  }
 
   console.log()
   console.log()
   console.log()
 
   console.log(
-    `The post '${name}' has successfully published in '${relativePublishDir}'.`
+    `The post '${name}' has successfully published in '${relativePostDir}'.`
   )
   console.log()
   console.log(`You can generate the posts data JSON from the posts!`)

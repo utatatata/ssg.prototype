@@ -8,11 +8,12 @@ const updateRevdate = (documentText, dateString) => {
 }
 
 const getRevnumber = documentText => {
-  const [revnumber] = documentText.match(
+  const result = documentText.match(
     /(?<=^:revnumber:.*v)[^\.\r\n]+(\.[^\.\r\n]+(\.[^\.\r\n]+)?)?/m
   )
-  if (revnumber === null) return null
+  if (result === null) return null
 
+  const [revnumber] = result
   const [major, minor, revision] = revnumber.split('.')
   return {
     str: revnumber,
