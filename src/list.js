@@ -1,4 +1,3 @@
-const path = require('path')
 const moment = require('moment')
 
 const pdu = require('./postDraftUtils')
@@ -20,7 +19,7 @@ module.exports = async config => {
 
     console.log('Drafts:')
     drafts.forEach(splitedPath => {
-      const [draftsDir, name, document] = splitedPath
+      const [, name] = splitedPath
       console.log(name)
     })
 
@@ -28,7 +27,7 @@ module.exports = async config => {
 
     console.log('Posts:')
     sortedPosts.forEach(splitedPath => {
-      const [postsDir, year, month, date, name, document] = splitedPath
+      const [, year, month, date, name] = splitedPath
       console.log(name, `(${year}-${month}-${date})`)
     })
   } catch (e) {

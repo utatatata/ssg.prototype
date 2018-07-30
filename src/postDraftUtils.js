@@ -54,10 +54,38 @@ const exist = async (name, draftsDir, postsDir) => {
   }
 }
 
+const draftPaths = (name, draftsDir, rootDir) => {
+  const dir = path.resolve(draftsDir, name)
+  const documentPath = path.join(dir, 'index.asciidoc')
+  const relativeDir = path.relative(rootDir, dir)
+  const relativeDocumentPath = path.relative(rootDir, documentPath)
+  return {
+    dir,
+    documentPath,
+    relativeDir,
+    relativeDocumentPath,
+  }
+}
+
+const postPaths = (name, postsDir, rootDir, year, month, date) => {
+  const dir = path.resolve(postsDir, year, month, date, name)
+  const documentPath = path.join(dir, 'index.asciidoc')
+  const relativeDir = path.relative(rootDir, dir)
+  const relativeDocumentPath = path.relative(rootDir, documentPath)
+  return {
+    dir,
+    documentPath,
+    relativeDir,
+    relativeDocumentPath,
+  }
+}
+
 module.exports = {
-  readPosts,
   readDrafts,
+  readPosts,
   existFromDrafts,
   existFromPosts,
   exist,
+  draftPaths,
+  postPaths,
 }
