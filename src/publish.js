@@ -61,9 +61,10 @@ module.exports = async (name, config) => {
     console.log()
 
     {
-      const draftDocumentText = (await u.readFile(
-        draftPaths.documentPath
-      )).toString()
+      const draftDocumentText = await u.readFile(
+        draftPaths.documentPath,
+        'utf8'
+      )
       const draftRev = au.getRevnumber(draftDocumentText)
       if (draftRev === null) {
         console.log(
@@ -89,9 +90,7 @@ module.exports = async (name, config) => {
     console.log()
 
     {
-      const postDocumentText = (await u.readFile(
-        postPaths.documentPath
-      )).toString()
+      const postDocumentText = await u.readFile(postPaths.documentPath, 'utf8')
       console.log(`Updating the revision date of the post '${name}'...`)
       const replacedPostDocumentText = au.updateRevdate(
         au.updatePublishdate(postDocumentText, now.format()),

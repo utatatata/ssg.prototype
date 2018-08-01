@@ -54,11 +54,23 @@ const exist = async (name, draftsDir, postsDir) => {
   }
 }
 
+const draftDir = (name, draftsDir) => path.resolve(draftsDir, name)
+const draftDocumentPath = (name, draftsDir) =>
+  path.join(draftDir(name, draftsDir), 'index.asciidoc')
+const draftRelativeDir = (name, draftsDir, rootDir) =>
+  path.relative(rootDir, draftDir(name, draftsDir))
+const draftRelativeDocumentPath = (name, draftsDir, rootDir) =>
+  path.relative(rootDir, draftDocumentPath(name, draftsDir))
+
 const draftPaths = (name, draftsDir, rootDir) => {
-  const dir = path.resolve(draftsDir, name)
-  const documentPath = path.join(dir, 'index.asciidoc')
-  const relativeDir = path.relative(rootDir, dir)
-  const relativeDocumentPath = path.relative(rootDir, documentPath)
+  const dir = draftDir(name, draftsDir)
+  const documentPath = draftDocumentPath(name, drafts)
+  const relativeDir = draftRelativeDir(name, drafts, rootDir)
+  const relativeDocumentPath = draftRelativeDocumentPath(
+    name,
+    draftsDir,
+    rootDir
+  )
   return {
     dir,
     documentPath,
@@ -67,11 +79,34 @@ const draftPaths = (name, draftsDir, rootDir) => {
   }
 }
 
+const postDir = (name, postsDir, year, month, date) =>
+  path.resolve(postsDir, year, month, date, name)
+const postDocumentPath = (name, postsDir, year, month, date) =>
+  path.join(postDir(name, postsDir, year, month, date), 'index.asciidoc')
+const postRelativeDir = (name, postsDir, rootDir, year, month, date) =>
+  path.relative(rootDir, postDir(name, postsDir, year, month, date))
+const postRelativeDocumentPath = (name, postsDir, rootDir, year, month, date) =>
+  path.relative(rootDir, postDocumentPath(name, postsDir, year, month, date))
+
 const postPaths = (name, postsDir, rootDir, year, month, date) => {
-  const dir = path.resolve(postsDir, year, month, date, name)
-  const documentPath = path.join(dir, 'index.asciidoc')
-  const relativeDir = path.relative(rootDir, dir)
-  const relativeDocumentPath = path.relative(rootDir, documentPath)
+  const dir = postDir(name, postsDir, year, month, date)
+  const documentPath = postDocumentPath(name, postsDir, year, month, date)
+  const relativeDir = postRelativeDir(
+    name,
+    postsDir,
+    rootDir,
+    year,
+    month,
+    date
+  )
+  const relativeDocumentPath = postRelativeDocumentPath(
+    name,
+    postsDir,
+    rootDir,
+    year,
+    month,
+    date
+  )
   return {
     dir,
     documentPath,
@@ -86,6 +121,14 @@ module.exports = {
   existFromDrafts,
   existFromPosts,
   exist,
+  draftDir,
+  draftDocumentPath,
+  draftRelativeDir,
+  draftRelativeDocumentPath,
   draftPaths,
+  postDir,
+  postDocumentPath,
+  postRelativeDir,
+  postRelativeDocumentPath,
   postPaths,
 }
