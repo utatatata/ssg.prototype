@@ -13,12 +13,22 @@ module.exports = async config => {
       }'...`
     )
 
-    const splitedPostPathList = await pdu.readPosts(config.postsDir)
+    const splitedPathList = await pdu.readPosts(config.postsDir)
 
-    const documentJSONList = splitedPostPathList.map(splitedPath => {
-      const document = asciidoctor.loadFile(path.join(...splitedPath))
+    const documentJSONList = splitedPathList.map(splitedPath => {
+      const [, year, month, date, name] = splitedPath
+      const paths = pdu.postPaths(
+        name,
+        config.postsDir,
+        config.rootDir,
+        year,
+        month,
+        date
+      )
+
+      const document = asciidoctor.loadFile(paths.documentPath)
       return {
-        path: splitedPath,
+        path: path.relative(config.postsDir, paths.documentPath),
         title: document.getAttribute('doctitle'),
         author: document.getAttribute('author'),
         email: document.getAttribute('email'),
