@@ -1,3 +1,5 @@
+const moment = require('moment')
+
 const updatePublishdate = (documentText, dateString) => {
   const publishdate = `:publishdate: ${dateString}\n`
   if (documentText.match(/^:publishdate:/m)) {
@@ -14,6 +16,17 @@ const updateRevdate = (documentText, dateString) => {
   } else {
     return documentText.replace(/^:revnumber:/m, `${revdate}:revnumber:`)
   }
+}
+
+const getPublishdate = documentText => {
+  const result = documentText.match(/(?<=^:publishdate:).*(?=[\r?\n])/m)
+  if (result === null) return null
+
+  const publishdateString = result[0].trim()
+  const publishdate = moment(publishdateString)
+  if (Number.isNaN(publishdate.valueOf())) return null
+
+  return publishdate
 }
 
 const getRevnumber = documentText => {
@@ -57,6 +70,7 @@ const compareRevnumber = (rev1, rev2) => {
 module.exports = {
   updatePublishdate,
   updateRevdate,
+  getPublishdate,
   getRevnumber,
   compareRevnumber,
 }
